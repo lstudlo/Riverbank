@@ -13,14 +13,21 @@
 		"publish": true
 	},
 	"dependencies": {
+		"@tailwindcss/vite": "^4.1.17",
+		"@tanstack/react-router": "^1.136.18",
+		"clsx": "^2.1.1",
 		"hono": "4.8.2",
 		"react": "19.0.0",
-		"react-dom": "19.0.0"
+		"react-dom": "19.0.0",
+		"tailwind-merge": "^3.4.0",
+		"tailwindcss": "^4.1.17"
 	},
 	"devDependencies": {
 		"@cloudflare/vite-plugin": "^1.15.1",
 		"@eslint/js": "9.29.0",
-		"@types/node": "24.0.4",
+		"@tanstack/router-devtools": "^1.136.18",
+		"@tanstack/router-plugin": "^1.136.18",
+		"@types/node": "^24.0.4",
 		"@types/react": "19.0.10",
 		"@types/react-dom": "19.0.4",
 		"@vitejs/plugin-react": "5.0.0",
