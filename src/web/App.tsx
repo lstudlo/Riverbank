@@ -1,10 +1,19 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { River } from "@/components/River";
 import { WavyText } from "@/components/WavyText";
-import { Flag, Send } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Flag, Send, User } from "lucide-react";
 
 type ReceivedBottle = {
 	id: string;
@@ -33,6 +42,7 @@ function App() {
 	const [nickname, setNickname] = useState("");
 	const [country, setCountry] = useState("");
 	const [receivedBottle, setReceivedBottle] = useState<ReceivedBottle | null>(null);
+	const [showReceivedBottle, setShowReceivedBottle] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [showThrowAnimation, setShowThrowAnimation] = useState(false);
@@ -46,12 +56,17 @@ function App() {
 
 		setError(null);
 		setLoading(true);
-		setShowThrowAnimation(true);
-		setReceivedBottle(null);
 		setReportSuccess(false);
 
-		// Let throw animation play
-		await new Promise(resolve => setTimeout(resolve, 500));
+		// First, smoothly hide the received bottle if visible
+		if (showReceivedBottle) {
+			setShowReceivedBottle(false);
+			// Wait for exit animation to complete
+			await new Promise(resolve => setTimeout(resolve, 1200));
+		}
+
+		setShowThrowAnimation(true);
+		setShowReceiveAnimation(false);
 
 		try {
 			const response = await fetch("/api/bottles/throw", {
@@ -69,18 +84,31 @@ function App() {
 			if (!response.ok) {
 				setError(data.error || "Something went wrong");
 				setShowThrowAnimation(false);
+				setLoading(false);
 				return;
 			}
 
-			// Success - clear form and show received bottle
+			// Success - clear form
 			setMessage("");
+
+			// Wait for throw animation to complete (3s exit animation)
+			await new Promise(resolve => setTimeout(resolve, 3000));
 			setShowThrowAnimation(false);
 
 			if (data.received) {
-				setShowReceiveAnimation(true);
+				// Store data first (won't render yet)
 				setReceivedBottle(data.received);
-			} else {
-				setReceivedBottle(null);
+
+				// Small delay before receive animation starts
+				await new Promise(resolve => setTimeout(resolve, 200));
+				setShowReceiveAnimation(true);
+
+				// Wait for bottle to reach center before showing UI (sync with 3s animation)
+				await new Promise(resolve => setTimeout(resolve, 2800));
+				setShowReceivedBottle(true);
+
+				// Reset receive animation state shortly after
+				setTimeout(() => setShowReceiveAnimation(false), 500);
 			}
 		} catch (err) {
 			setError("Failed to connect to the river");
@@ -122,10 +150,17 @@ function App() {
 	return (
 		<div className="min-h-screen bg-background font-sans flex flex-col transition-colors">
 			{/* Fixed Header */}
-			<header className="h-12 flex items-center justify-center border-b border-border shrink-0">
+			<header className="h-12 flex items-center justify-between border-b border-border shrink-0 px-4">
+				<ThemeToggle />
 				<h1 className="text-xl font-serif font-light text-foreground tracking-wide">
 					Riverbank
 				</h1>
+				<button
+					className="p-2 rounded-md bg-background-secondary text-foreground hover:opacity-80 transition-opacity"
+					aria-label="User login"
+				>
+					<User className="h-5 w-5" />
+				</button>
 			</header>
 
 			{/* Main Content */}
@@ -137,13 +172,24 @@ function App() {
 					</p>
 
 					{/* Composition Area */}
-					<div className={`bg-background-secondary rounded-lg p-6 mb-8 transition-opacity duration-500 ${showThrowAnimation ? 'animate-drift-out' : ''}`}>
+					<motion.div
+						className="bg-background-secondary rounded-lg p-6 mb-8"
+						animate={{
+							opacity: showThrowAnimation ? 0.4 : 1,
+							y: showThrowAnimation ? -10 : 0,
+							scale: showThrowAnimation ? 0.98 : 1,
+						}}
+						transition={{
+							duration: 0.8,
+							ease: [0.25, 0.1, 0.25, 1],
+						}}
+					>
 						<Textarea
 							placeholder="Write your message..."
 							value={message}
 							onChange={(e) => setMessage(e.target.value.slice(0, 280))}
 							disabled={loading}
-							className="font-serif text-lg text-foreground border-0 bg-transparent resize-none min-h-[120px] focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-foreground-subtle"
+							className="font-serif text-lg text-foreground bg-background border-0 shadow-none resize-none min-h-[120px] focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-foreground-subtle"
 						/>
 
 						<div className="flex justify-between items-center text-sm text-foreground-muted mt-2 mb-4">
@@ -160,19 +206,18 @@ function App() {
 								value={nickname}
 								onChange={(e) => setNickname(e.target.value.slice(0, 30))}
 								disabled={loading}
-								className="flex-1 text-sm bg-background border-border text-foreground placeholder:text-foreground-subtle"
+								className="flex-1 text-sm shadow-none bg-background border-border text-foreground placeholder:text-foreground-subtle"
 							/>
-							<select
-								value={country}
-								onChange={(e) => setCountry(e.target.value)}
-								disabled={loading}
-								className="flex-1 text-sm bg-background border border-border rounded-md px-3 py-2 text-foreground"
-							>
-								<option value="">Country (optional)</option>
-								{COUNTRIES.filter(c => c).map(c => (
-									<option key={c} value={c}>{c}</option>
-								))}
-							</select>
+							<Select value={country} onValueChange={setCountry} disabled={loading}>
+								<SelectTrigger className="flex-1 text-sm shadow-none bg-background border-border text-foreground">
+									<SelectValue placeholder="Country (optional)" />
+								</SelectTrigger>
+								<SelectContent>
+									{COUNTRIES.filter(c => c).map(c => (
+										<SelectItem key={c} value={c}>{c}</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
 						</div>
 
 						{/* Error display */}
@@ -199,39 +244,52 @@ function App() {
 								</span>
 							)}
 						</Button>
-					</div>
+					</motion.div>
 
 					{/* Received Bottle */}
-					{receivedBottle && (
-						<div className={`bg-background-secondary rounded-lg p-6 ${showReceiveAnimation ? 'animate-drift-in' : ''}`}>
-							<div className="text-xs text-foreground-muted uppercase tracking-wider mb-3 flex justify-between items-center">
-								<span>A bottle washed ashore</span>
-								<span>#{receivedBottle.id_asc}</span>
-							</div>
+					<AnimatePresence>
+						{showReceivedBottle && receivedBottle && (
+							<motion.div
+								key="received-bottle"
+								className="bg-background-secondary rounded-lg p-6"
+								initial={{ opacity: 0, y: 40, scale: 0.96 }}
+								animate={{ opacity: 1, y: 0, scale: 1 }}
+								exit={{ opacity: 0, y: -30, scale: 0.96 }}
+								transition={{
+									duration: 1.2,
+									ease: [0.22, 1, 0.36, 1],
+									opacity: { duration: 1.4, ease: [0.22, 1, 0.36, 1] }
+								}}
+							>
+								<div className="text-xs text-foreground-muted uppercase tracking-wider mb-3 flex justify-between items-center">
+									<span>A bottle washed ashore</span>
+									<span>#{receivedBottle.id_asc}</span>
+								</div>
 
-							<p className="font-serif text-xl text-foreground leading-relaxed mb-4">
-								<WavyText text={receivedBottle.message} />
-							</p>
+								<p className="font-serif text-xl text-foreground leading-relaxed mb-4">
+									<WavyText text={receivedBottle.message} />
+								</p>
 
-							<div className="flex justify-between items-center">
-								<span className="text-sm text-foreground-muted italic">
-									{formatSender(receivedBottle)}
-								</span>
+								<div className="flex justify-between items-center">
+									<span className="text-sm text-foreground-muted italic">
+										{formatSender(receivedBottle)}
+									</span>
 
-								{!reportSuccess ? (
-									<button
-										onClick={reportBottle}
-										className="text-foreground-subtle hover:text-red-600 transition-colors p-2"
-										title="Report inappropriate content"
-									>
-										<Flag className="w-4 h-4" />
-									</button>
-								) : (
-									<span className="text-xs text-foreground-subtle">Reported</span>
-								)}
-							</div>
-						</div>
-					)}
+									{!reportSuccess ? (
+										<button
+											onClick={reportBottle}
+											className="text-foreground-subtle hover:text-red-600 transition-colors p-2"
+											title="Report inappropriate content"
+										>
+											<Flag className="w-4 h-4" />
+										</button>
+									) : (
+										<span className="text-xs text-foreground-subtle">Reported</span>
+									)}
+								</div>
+							</motion.div>
+						)}
+					</AnimatePresence>
 
 					{/* Empty pool state */}
 					{receivedBottle === null && !loading && message === "" && (

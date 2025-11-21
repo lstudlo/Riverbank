@@ -74,9 +74,9 @@ export function River({ isSending, isReceiving }: RiverProps) {
 			>
 				<defs>
 					<linearGradient id="riverGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-						<stop offset="0%" stopColor="var(--color-foreground-muted)" stopOpacity="0.1" />
-						<stop offset="40%" stopColor="var(--color-foreground-muted)" stopOpacity="0.3" />
-						<stop offset="100%" stopColor="var(--color-foreground)" stopOpacity="0.5" />
+						<stop offset="0%" stopColor="var(--color-foreground-muted)" stopOpacity="0.25" />
+						<stop offset="40%" stopColor="var(--color-foreground-muted)" stopOpacity="0.15" />
+						<stop offset="100%" stopColor="var(--color-foreground)" stopOpacity="0.25" />
 					</linearGradient>
 				</defs>
 				{/* Back wave - behind the bottle */}
@@ -96,14 +96,14 @@ export function River({ isSending, isReceiving }: RiverProps) {
 			>
 				<defs>
 					<linearGradient id="riverGradient2" x1="0%" y1="0%" x2="0%" y2="100%">
-						<stop offset="0%" stopColor="var(--color-foreground-muted)" stopOpacity="0.15" />
-						<stop offset="100%" stopColor="var(--color-foreground)" stopOpacity="0.4" />
+						<stop offset="0%" stopColor="var(--color-foreground-muted)" stopOpacity="0.5" />
+						<stop offset="100%" stopColor="var(--color-foreground)" stopOpacity="0.75" />
 					</linearGradient>
 				</defs>
 				{/* Middle wave - slightly in front */}
-				<motion.path d={wavePath2} fill="url(#riverGradient2)" opacity={0.7} />
+				<motion.path d={wavePath2} fill="url(#riverGradient2)" opacity={0.75} />
 				{/* Front wave - most in front */}
-				<motion.path d={wavePath3} fill="url(#riverGradient)" opacity={0.5} />
+				<motion.path d={wavePath3} fill="url(#riverGradient)" opacity={1} />
 			</svg>
 		</div>
 	);
