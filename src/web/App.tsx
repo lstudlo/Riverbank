@@ -14,7 +14,7 @@ import { River } from "@/components/River";
 import { WavyText } from "@/components/WavyText";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserButton } from "@/components/user-button";
-import { Flag, Send } from "lucide-react";
+import { Flag, Send, Heart } from "lucide-react";
 
 type ReceivedBottle = {
 	id: string;
@@ -22,11 +22,13 @@ type ReceivedBottle = {
 	message: string;
 	nickname: string | null;
 	country: string | null;
+	like_count: number;
+	report_count: number;
 };
 
 type ThrowResponse = {
 	sent: boolean;
-	received: ReceivedBottle | null;
+	received: ReceivedBottle[];
 	error?: string;
 };
 
@@ -42,22 +44,26 @@ function App() {
 	const [message, setMessage] = useState("");
 	const [nickname, setNickname] = useState("");
 	const [country, setCountry] = useState("");
-	const [receivedBottle, setReceivedBottle] = useState<ReceivedBottle | null>(null);
+	const [receivedBottles, setReceivedBottles] = useState<ReceivedBottle[]>([]);
 	const [showReceivedBottle, setShowReceivedBottle] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [showThrowAnimation, setShowThrowAnimation] = useState(false);
 	const [showReceiveAnimation, setShowReceiveAnimation] = useState(false);
-	const [reportSuccess, setReportSuccess] = useState(false);
+	const [likedBottles, setLikedBottles] = useState<Set<string>>(new Set());
+	const [reportedBottles, setReportedBottles] = useState<Set<string>>(new Set());
 
-	const charsRemaining = 280 - message.length;
+	const charsRemaining = 300 - message.length;
+	const minChars = 15;
+	const canSubmit = message.trim().length >= minChars;
 
 	const throwBottle = async () => {
-		if (!message.trim()) return;
+		if (!message.trim() || !canSubmit) return;
 
 		setError(null);
 		setLoading(true);
-		setReportSuccess(false);
+		setLikedBottles(new Set());
+		setReportedBottles(new Set());
 
 		// First, smoothly hide the received bottle if visible
 		if (showReceivedBottle) {
@@ -96,9 +102,9 @@ function App() {
 			await new Promise(resolve => setTimeout(resolve, 3000));
 			setShowThrowAnimation(false);
 
-			if (data.received) {
+			if (data.received && data.received.length > 0) {
 				// Store data first (won't render yet)
-				setReceivedBottle(data.received);
+				setReceivedBottles(data.received);
 
 				// Small delay before receive animation starts
 				await new Promise(resolve => setTimeout(resolve, 200));
@@ -119,19 +125,36 @@ function App() {
 		}
 	};
 
-	const reportBottle = async () => {
-		if (!receivedBottle) return;
-
+	const reportBottle = async (bottleId: string) => {
 		try {
-			const response = await fetch(`/api/bottles/${receivedBottle.id}/report`, {
+			const response = await fetch(`/api/bottles/${bottleId}/report`, {
 				method: "POST",
 			});
 
 			if (response.ok) {
-				setReportSuccess(true);
+				setReportedBottles(prev => new Set([...prev, bottleId]));
 			}
 		} catch (err) {
 			console.error("Failed to report bottle:", err);
+		}
+	};
+
+	const likeBottle = async (bottleId: string) => {
+		try {
+			const response = await fetch(`/api/bottles/${bottleId}/like`, {
+				method: "POST",
+			});
+
+			if (response.ok) {
+				const data = await response.json();
+				setLikedBottles(prev => new Set([...prev, bottleId]));
+				// Update the like count in the bottles array
+				setReceivedBottles(prev => prev.map(b =>
+					b.id === bottleId ? { ...b, like_count: data.like_count } : b
+				));
+			}
+		} catch (err) {
+			console.error("Failed to like bottle:", err);
 		}
 	};
 
@@ -184,15 +207,23 @@ function App() {
 							<Textarea
 								placeholder="Write your message..."
 								value={message}
-								onChange={(e) => setMessage(e.target.value.slice(0, 256))}
+								onChange={(e) => setMessage(e.target.value.slice(0, 300))}
 								disabled={loading}
 								className="font-serif text-foreground bg-background dark:bg-background border-0 shadow-none resize-none min-h-[120px]"
 							/>
-							
-							<div className="flex justify-end items-center text-xs text-muted-foreground mt-2">
-							<span className={charsRemaining < 30 ? "text-red-600" : ""}>
-								{message.length} / {charsRemaining}
-							</span>
+
+							<div className="flex justify-between items-center text-xs text-muted-foreground mt-2">
+								<span className="text-muted-foreground">
+									{message.length < minChars && message.length > 0 && (
+										<span className="text-amber-600">Min {minChars} chars</span>
+									)}
+									{message.length >= 151 && <span className="text-green-600">3 bottles</span>}
+									{message.length >= 61 && message.length < 151 && <span className="text-blue-600">2 bottles</span>}
+									{message.length >= minChars && message.length < 61 && <span>1 bottle</span>}
+								</span>
+								<span className={charsRemaining < 30 ? "text-red-600" : ""}>
+									{message.length} / 300
+								</span>
 							</div>
 						</div>
 						
@@ -230,7 +261,7 @@ function App() {
 							<Button
 								onClick={throwBottle}
 								variant={"outline"}
-								disabled={loading || !message.trim()}
+								disabled={loading || !canSubmit}
 								className="transition-all flex-1 rounded-xl rounded-t-none"
 							>
 								{loading ? (
@@ -247,53 +278,77 @@ function App() {
 						</div>
 					</motion.div>
 
-					{/* Received Bottle */}
+					{/* Received Bottles */}
 					<AnimatePresence>
-						{showReceivedBottle && receivedBottle && (
+						{showReceivedBottle && receivedBottles.length > 0 && (
 							<motion.div
-								key="received-bottle"
-								className="bg-muted rounded-lg p-6 border-[1px]"
-								initial={{ opacity: 0, y: 40, scale: 0.96 }}
-								animate={{ opacity: 1, y: 0, scale: 1 }}
-								exit={{ opacity: 0, y: -30, scale: 0.96 }}
+								key="received-bottles"
+								className={`grid gap-4 ${receivedBottles.length === 1 ? 'grid-cols-1' : receivedBottles.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}
+								initial={{ opacity: 0, y: 40 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -30 }}
 								transition={{
 									duration: 1.2,
 									ease: [0.22, 1, 0.36, 1],
-									opacity: { duration: 1.4, ease: [0.22, 1, 0.36, 1] }
 								}}
 							>
-								<div className="text-xs text-muted-foreground uppercase tracking-wider mb-3 flex justify-between items-center">
-									<span>A bottle washed ashore</span>
-									<span>#{receivedBottle.id_asc}</span>
-								</div>
+								{receivedBottles.map((bottle, index) => (
+									<motion.div
+										key={bottle.id}
+										className="bg-muted rounded-lg p-4 border-[1px]"
+										initial={{ opacity: 0, scale: 0.96 }}
+										animate={{ opacity: 1, scale: 1 }}
+										transition={{
+											duration: 0.8,
+											delay: index * 0.15,
+											ease: [0.22, 1, 0.36, 1],
+										}}
+									>
+										<div className="text-xs text-muted-foreground uppercase tracking-wider mb-2 flex justify-between items-center">
+											<span>Bottle #{bottle.id_asc}</span>
+										</div>
 
-								<p className="font-serif text-xl text-foreground leading-relaxed mb-4">
-									<WavyText text={receivedBottle.message} />
-								</p>
+										<p className="font-serif text-lg text-foreground leading-relaxed mb-3">
+											<WavyText text={bottle.message} delay={index * 0.1} />
+										</p>
 
-								<div className="flex justify-between items-center">
-									<span className="text-sm text-muted-foreground italic">
-										{formatSender(receivedBottle)}
-									</span>
+										<div className="text-sm text-muted-foreground italic mb-3">
+											{formatSender(bottle)}
+										</div>
 
-									{!reportSuccess ? (
-										<button
-											onClick={reportBottle}
-											className="text-muted-foreground hover:text-red-600 transition-colors p-2"
-											title="Report inappropriate content"
-										>
-											<Flag className="w-4 h-4" />
-										</button>
-									) : (
-										<span className="text-xs text-muted-foreground">Reported</span>
-									)}
-								</div>
+										<div className="flex justify-between items-center">
+											<button
+												onClick={() => likeBottle(bottle.id)}
+												disabled={likedBottles.has(bottle.id)}
+												className={`flex items-center gap-1 transition-colors p-1 ${likedBottles.has(bottle.id) ? 'text-pink-500' : 'text-muted-foreground hover:text-pink-500'}`}
+												title="Like this message"
+											>
+												<Heart className={`w-4 h-4 ${likedBottles.has(bottle.id) ? 'fill-current' : ''}`} />
+												{bottle.like_count > 0 && (
+													<span className="text-xs">{bottle.like_count}</span>
+												)}
+											</button>
+
+											{!reportedBottles.has(bottle.id) ? (
+												<button
+													onClick={() => reportBottle(bottle.id)}
+													className="text-muted-foreground hover:text-red-600 transition-colors p-1"
+													title="Report inappropriate content"
+												>
+													<Flag className="w-4 h-4" />
+												</button>
+											) : (
+												<span className="text-xs text-muted-foreground">Reported</span>
+											)}
+										</div>
+									</motion.div>
+								))}
 							</motion.div>
 						)}
 					</AnimatePresence>
 
 					{/* Empty pool state */}
-					{receivedBottle === null && !loading && message === "" && (
+					{receivedBottles.length === 0 && !loading && message === "" && (
 						<div className="text-center text-muted-foreground text-sm">
 							<p className="mb-2">No bottles in the river yet.</p>
 							<p>Be the first to cast your thoughts into the current.</p>

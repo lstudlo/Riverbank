@@ -15,9 +15,9 @@
 		"lint": "eslint .",
 		"preview": "npm run build && vite preview",
 		"db:generate": "drizzle-kit generate",
-		"db:migrate": "wrangler d1 execute DB --local --file=./migrations/0001_*.sql",
-		"db:migrate:uat": "wrangler d1 execute DB --env uat --file=./migrations/0001_*.sql",
-		"db:migrate:pro": "wrangler d1 execute DB --env production --file=./migrations/0001_*.sql",
+		"db:migrate": "./scripts/migrate.sh local",
+		"db:migrate:uat": "./scripts/migrate.sh uat",
+		"db:migrate:pro": "./scripts/migrate.sh production",
 		"db:studio": "drizzle-kit studio",
 		"db:studio:local": "drizzle-kit studio --config drizzle.config.local.ts",
 		"db:studio:remote": "drizzle-kit studio --config drizzle.config.ts"

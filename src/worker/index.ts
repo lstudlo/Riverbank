@@ -157,8 +157,19 @@ app.post("/api/bottles/throw", async (c) => {
 	}
 
 	const trimmedMessage = message.trim();
-	if (trimmedMessage.length > 280) {
-		return c.json({ error: "Message must be 280 characters or less" }, 400);
+	if (trimmedMessage.length < 15) {
+		return c.json({ error: "Message must be at least 15 characters" }, 400);
+	}
+	if (trimmedMessage.length > 300) {
+		return c.json({ error: "Message must be 300 characters or less" }, 400);
+	}
+
+	// Determine how many bottles to receive based on message length
+	let bottlesToReceive = 1;
+	if (trimmedMessage.length >= 151) {
+		bottlesToReceive = 3;
+	} else if (trimmedMessage.length >= 61) {
+		bottlesToReceive = 2;
 	}
 
 	// Check for profanity
@@ -194,8 +205,8 @@ app.post("/api/bottles/throw", async (c) => {
 
 	const newBottleId = insertedBottle[0].id;
 
-	// Get a random bottle (exclude the one just thrown and reported ones)
-	const randomBottle = await db
+	// Get random bottles (exclude the one just thrown and reported ones)
+	const randomBottles = await db
 		.select()
 		.from(bottles)
 		.where(and(
@@ -203,22 +214,22 @@ app.post("/api/bottles/throw", async (c) => {
 			ne(bottles.id, newBottleId)
 		))
 		.orderBy(sql`RANDOM()`)
-		.limit(1);
+		.limit(bottlesToReceive);
 
-	const received: Omit<Bottle, "status" | "created_at" | "ip"> | null = randomBottle.length > 0
-		? {
-			id: randomBottle[0].id,
-			id_asc: randomBottle[0].id_asc,
-			message: randomBottle[0].message,
-			nickname: randomBottle[0].nickname,
-			country: randomBottle[0].country,
-		}
-		: null;
+	const received: Array<Omit<Bottle, "status" | "created_at" | "ip">> = randomBottles.map(bottle => ({
+		id: bottle.id,
+		id_asc: bottle.id_asc,
+		message: bottle.message,
+		nickname: bottle.nickname,
+		country: bottle.country,
+		like_count: bottle.like_count,
+		report_count: bottle.report_count,
+	}));
 
 	return c.json({ sent: true, received });
 });
 
-// Report a bottle
+// Report a bottle (increment report_count)
 app.post("/api/bottles/:id/report", async (c) => {
 	const db = getDb(c.env.DB);
 	const id = c.req.param("id");
@@ -228,7 +239,7 @@ app.post("/api/bottles/:id/report", async (c) => {
 	}
 
 	const result = await db.update(bottles)
-		.set({ status: "reported" })
+		.set({ report_count: sql`report_count + 1` })
 		.where(eq(bottles.id, id))
 		.returning();
 
@@ -236,7 +247,28 @@ app.post("/api/bottles/:id/report", async (c) => {
 		return c.json({ error: "Bottle not found" }, 404);
 	}
 
-	return c.json({ reported: true });
+	return c.json({ reported: true, report_count: result[0].report_count });
+});
+
+// Like a bottle (increment like_count)
+app.post("/api/bottles/:id/like", async (c) => {
+	const db = getDb(c.env.DB);
+	const id = c.req.param("id");
+
+	if (!id) {
+		return c.json({ error: "Invalid bottle ID" }, 400);
+	}
+
+	const result = await db.update(bottles)
+		.set({ like_count: sql`like_count + 1` })
+		.where(eq(bottles.id, id))
+		.returning();
+
+	if (result.length === 0) {
+		return c.json({ error: "Bottle not found" }, 404);
+	}
+
+	return c.json({ liked: true, like_count: result[0].like_count });
 });
 
 export default app;

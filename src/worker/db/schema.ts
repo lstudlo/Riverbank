@@ -25,6 +25,8 @@ export const bottles = sqliteTable("bottles", {
 	country: text("country"),
 	ip: text("ip"),
 	status: text("status").notNull().default("active"),
+	like_count: integer("like_count").notNull().default(0),
+	report_count: integer("report_count").notNull().default(0),
 	created_at: integer("created_at", { mode: "timestamp" })
 		.notNull()
 		.default(sql`(unixepoch())`),
