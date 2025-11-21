@@ -1,7 +1,8 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { eq, desc, ne, and, sql } from "drizzle-orm";
+import { eq, desc, ne, and, sql, max } from "drizzle-orm";
 import { getDb, todos, bottles, type Bottle } from "./db";
+import { nanoid } from "nanoid";
 
 // Basic profanity word list
 const PROFANITY_LIST = [
@@ -32,7 +33,7 @@ app.get("/api/todos", async (c) => {
 // Get a single todo
 app.get("/api/todos/:id", async (c) => {
 	const db = getDb(c.env.DB);
-	const id = Number(c.req.param("id"));
+	const id = c.req.param("id");
 	const result = await db.select().from(todos).where(eq(todos.id, id));
 
 	if (result.length === 0) {
@@ -51,7 +52,13 @@ app.post("/api/todos", async (c) => {
 		return c.json({ error: "Title is required" }, 400);
 	}
 
+	// Get next id_asc value
+	const maxResult = await db.select({ maxId: max(todos.id_asc) }).from(todos);
+	const nextIdAsc = (maxResult[0]?.maxId ?? 0) + 1;
+
 	const result = await db.insert(todos).values({
+		id: nanoid(),
+		id_asc: nextIdAsc,
 		title: title.trim(),
 		completed: false,
 	}).returning();
@@ -62,7 +69,7 @@ app.post("/api/todos", async (c) => {
 // Update a todo
 app.put("/api/todos/:id", async (c) => {
 	const db = getDb(c.env.DB);
-	const id = Number(c.req.param("id"));
+	const id = c.req.param("id");
 	const { title, completed } = await c.req.json();
 
 	const updateData: Partial<typeof todos.$inferInsert> = {};
@@ -96,7 +103,7 @@ app.put("/api/todos/:id", async (c) => {
 // Delete a todo
 app.delete("/api/todos/:id", async (c) => {
 	const db = getDb(c.env.DB);
-	const id = Number(c.req.param("id"));
+	const id = c.req.param("id");
 
 	const result = await db.delete(todos).where(eq(todos.id, id)).returning();
 
@@ -110,7 +117,7 @@ app.delete("/api/todos/:id", async (c) => {
 // Toggle todo completion
 app.patch("/api/todos/:id/toggle", async (c) => {
 	const db = getDb(c.env.DB);
-	const id = Number(c.req.param("id"));
+	const id = c.req.param("id");
 
 	// First, get the current todo
 	const current = await db.select().from(todos).where(eq(todos.id, id));
@@ -165,11 +172,23 @@ app.post("/api/bottles/throw", async (c) => {
 		return c.json({ error: "Nickname must be 30 characters or less" }, 400);
 	}
 
+	// Get client IP address
+	const clientIp = c.req.header("CF-Connecting-IP")
+		|| c.req.header("X-Forwarded-For")?.split(",")[0]?.trim()
+		|| null;
+
+	// Get next id_asc value
+	const maxResult = await db.select({ maxId: max(bottles.id_asc) }).from(bottles);
+	const nextIdAsc = (maxResult[0]?.maxId ?? 0) + 1;
+
 	// Insert the new bottle
 	const insertedBottle = await db.insert(bottles).values({
+		id: nanoid(),
+		id_asc: nextIdAsc,
 		message: trimmedMessage,
 		nickname: trimmedNickname,
 		country: country?.trim() || null,
+		ip: clientIp,
 		status: "active",
 	}).returning();
 
@@ -186,9 +205,10 @@ app.post("/api/bottles/throw", async (c) => {
 		.orderBy(sql`RANDOM()`)
 		.limit(1);
 
-	const received: Omit<Bottle, "status" | "created_at"> | null = randomBottle.length > 0
+	const received: Omit<Bottle, "status" | "created_at" | "ip"> | null = randomBottle.length > 0
 		? {
 			id: randomBottle[0].id,
+			id_asc: randomBottle[0].id_asc,
 			message: randomBottle[0].message,
 			nickname: randomBottle[0].nickname,
 			country: randomBottle[0].country,
@@ -201,9 +221,9 @@ app.post("/api/bottles/throw", async (c) => {
 // Report a bottle
 app.post("/api/bottles/:id/report", async (c) => {
 	const db = getDb(c.env.DB);
-	const id = Number(c.req.param("id"));
+	const id = c.req.param("id");
 
-	if (isNaN(id)) {
+	if (!id) {
 		return c.json({ error: "Invalid bottle ID" }, 400);
 	}
 

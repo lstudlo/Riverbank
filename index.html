@@ -4,7 +4,18 @@
 		<meta charset="UTF-8" />
 		<link rel="icon" type="image/svg+xml" href="/vite.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Vite + React + TS</title>
+		<title>Riverbank</title>
+		<script>
+			// Prevent theme flash - runs before CSS loads
+			(function() {
+				const stored = localStorage.getItem('riverbank-theme');
+				let theme = stored;
+				if (!theme || theme === 'system') {
+					theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+				}
+				document.documentElement.classList.add(theme);
+			})();
+		</script>
 	</head>
 
 	<body>

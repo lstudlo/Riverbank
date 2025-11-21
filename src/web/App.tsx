@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { River } from "@/components/River";
+import { WavyText } from "@/components/WavyText";
 import { Flag, Send } from "lucide-react";
 
 type ReceivedBottle = {
-	id: number;
+	id: string;
+	id_asc: number;
 	message: string;
 	nickname: string | null;
 	country: string | null;
@@ -118,10 +120,10 @@ function App() {
 	};
 
 	return (
-		<div className="min-h-screen bg-ink font-sans flex flex-col">
+		<div className="min-h-screen bg-background font-sans flex flex-col transition-colors">
 			{/* Fixed Header */}
-			<header className="h-12 flex items-center justify-center border-b border-ink-soft shrink-0">
-				<h1 className="text-xl font-serif font-light text-vellum tracking-wide">
+			<header className="h-12 flex items-center justify-center border-b border-border shrink-0">
+				<h1 className="text-xl font-serif font-light text-foreground tracking-wide">
 					Riverbank
 				</h1>
 			</header>
@@ -130,21 +132,21 @@ function App() {
 			<main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
 				<div className="w-full max-w-lg">
 					{/* Tagline */}
-					<p className="text-slate-light text-sm text-center mb-8">
+					<p className="text-foreground-subtle text-sm text-center mb-8">
 						Throw a thought, receive a thought
 					</p>
 
 					{/* Composition Area */}
-					<div className={`bg-vellum rounded-lg p-6 mb-8 transition-opacity duration-500 ${showThrowAnimation ? 'animate-drift-out' : ''}`}>
+					<div className={`bg-background-secondary rounded-lg p-6 mb-8 transition-opacity duration-500 ${showThrowAnimation ? 'animate-drift-out' : ''}`}>
 						<Textarea
 							placeholder="Write your message..."
 							value={message}
 							onChange={(e) => setMessage(e.target.value.slice(0, 280))}
 							disabled={loading}
-							className="font-serif text-lg text-ink border-0 bg-transparent resize-none min-h-[120px] focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-slate-light"
+							className="font-serif text-lg text-foreground border-0 bg-transparent resize-none min-h-[120px] focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-foreground-subtle"
 						/>
 
-						<div className="flex justify-between items-center text-sm text-slate mt-2 mb-4">
+						<div className="flex justify-between items-center text-sm text-foreground-muted mt-2 mb-4">
 							<span className={charsRemaining < 30 ? "text-red-600" : ""}>
 								{charsRemaining} characters remaining
 							</span>
@@ -158,13 +160,13 @@ function App() {
 								value={nickname}
 								onChange={(e) => setNickname(e.target.value.slice(0, 30))}
 								disabled={loading}
-								className="flex-1 text-sm bg-vellum-dark border-0 text-ink placeholder:text-slate-light"
+								className="flex-1 text-sm bg-background border-border text-foreground placeholder:text-foreground-subtle"
 							/>
 							<select
 								value={country}
 								onChange={(e) => setCountry(e.target.value)}
 								disabled={loading}
-								className="flex-1 text-sm bg-vellum-dark border-0 rounded-md px-3 py-2 text-ink"
+								className="flex-1 text-sm bg-background border border-border rounded-md px-3 py-2 text-foreground"
 							>
 								<option value="">Country (optional)</option>
 								{COUNTRIES.filter(c => c).map(c => (
@@ -184,7 +186,7 @@ function App() {
 						<Button
 							onClick={throwBottle}
 							disabled={loading || !message.trim()}
-							className="w-full bg-ink hover:bg-ink-soft text-vellum font-medium py-6 text-lg transition-all"
+							className="w-full bg-accent hover:opacity-90 text-accent-foreground font-medium py-6 text-lg transition-all"
 						>
 							{loading ? (
 								<span className="flex items-center gap-2">
@@ -201,30 +203,31 @@ function App() {
 
 					{/* Received Bottle */}
 					{receivedBottle && (
-						<div className={`bg-vellum rounded-lg p-6 ${showReceiveAnimation ? 'animate-drift-in' : ''}`}>
-							<div className="text-xs text-slate uppercase tracking-wider mb-3">
-								A bottle washed ashore
+						<div className={`bg-background-secondary rounded-lg p-6 ${showReceiveAnimation ? 'animate-drift-in' : ''}`}>
+							<div className="text-xs text-foreground-muted uppercase tracking-wider mb-3 flex justify-between items-center">
+								<span>A bottle washed ashore</span>
+								<span>#{receivedBottle.id_asc}</span>
 							</div>
 
-							<p className="font-serif text-xl text-ink leading-relaxed mb-4 animate-float">
-								{receivedBottle.message}
+							<p className="font-serif text-xl text-foreground leading-relaxed mb-4">
+								<WavyText text={receivedBottle.message} />
 							</p>
 
 							<div className="flex justify-between items-center">
-								<span className="text-sm text-slate italic">
+								<span className="text-sm text-foreground-muted italic">
 									{formatSender(receivedBottle)}
 								</span>
 
 								{!reportSuccess ? (
 									<button
 										onClick={reportBottle}
-										className="text-slate-light hover:text-red-600 transition-colors p-2"
+										className="text-foreground-subtle hover:text-red-600 transition-colors p-2"
 										title="Report inappropriate content"
 									>
 										<Flag className="w-4 h-4" />
 									</button>
 								) : (
-									<span className="text-xs text-slate-light">Reported</span>
+									<span className="text-xs text-foreground-subtle">Reported</span>
 								)}
 							</div>
 						</div>
@@ -232,7 +235,7 @@ function App() {
 
 					{/* Empty pool state */}
 					{receivedBottle === null && !loading && message === "" && (
-						<div className="text-center text-slate-light text-sm">
+						<div className="text-center text-foreground-subtle text-sm">
 							<p className="mb-2">No bottles in the river yet.</p>
 							<p>Be the first to cast your thoughts into the current.</p>
 						</div>
@@ -240,18 +243,20 @@ function App() {
 				</div>
 			</main>
 
-			{/* River Visualization */}
-			<River isSending={showThrowAnimation} isReceiving={showReceiveAnimation} />
+			{/* River Visualization with Footer */}
+			<div className="relative shrink-0">
+				<River isSending={showThrowAnimation} isReceiving={showReceiveAnimation} />
 
-			{/* Fixed Footer */}
-			<footer className="h-12 flex items-center justify-center border-t border-ink-soft shrink-0">
-				<div className="flex items-center gap-4 text-slate text-xs">
-					<span>&copy; {new Date().getFullYear()} Riverbank</span>
-					<span className="text-slate-light">|</span>
-					<a href="/terms" className="hover:text-vellum transition-colors">Terms</a>
-					<a href="/privacy" className="hover:text-vellum transition-colors">Privacy</a>
-				</div>
-			</footer>
+				{/* Footer overlaid on river */}
+				<footer className="absolute bottom-0 left-0 right-0 h-12 flex items-center justify-center bg-transparent">
+					<div className="flex items-center gap-4 text-background text-xs">
+						<span>&copy; {new Date().getFullYear()} Riverbank</span>
+						<span className="opacity-60">|</span>
+						<a href="/terms" className="hover:opacity-80 transition-opacity">Terms</a>
+						<a href="/privacy" className="hover:opacity-80 transition-opacity">Privacy</a>
+					</div>
+				</footer>
+			</div>
 		</div>
 	);
 }

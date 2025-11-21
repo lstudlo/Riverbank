@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* Monochrome color palette - ink, vellum, slate */
+  /* Base color palette - ink, vellum, slate */
   --color-ink: #0a0a0a;
   --color-ink-soft: #1a1a1a;
   --color-slate: #525252;
@@ -10,9 +10,43 @@
   --color-vellum: #faf9f6;
   --color-vellum-dark: #f0efe8;
 
+  /* Semantic theme colors - these get overridden by :root/.dark */
+  --color-background: var(--color-vellum);
+  --color-background-secondary: var(--color-vellum-dark);
+  --color-foreground: var(--color-ink);
+  --color-foreground-muted: var(--color-slate);
+  --color-foreground-subtle: var(--color-slate-light);
+  --color-border: var(--color-vellum-dark);
+  --color-accent: var(--color-ink);
+  --color-accent-foreground: var(--color-vellum);
+
   /* Typography - Classical serif + geometric sans */
   --font-serif: "Playfair Display", Georgia, Cambria, "Times New Roman", Times, serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Theme variables - Light mode (default) */
+:root {
+  --color-background: var(--color-vellum);
+  --color-background-secondary: var(--color-vellum-dark);
+  --color-foreground: var(--color-ink);
+  --color-foreground-muted: var(--color-slate);
+  --color-foreground-subtle: var(--color-slate-light);
+  --color-border: var(--color-vellum-dark);
+  --color-accent: var(--color-ink);
+  --color-accent-foreground: var(--color-vellum);
+}
+
+/* Theme variables - Dark mode */
+.dark {
+  --color-background: var(--color-ink);
+  --color-background-secondary: var(--color-ink-soft);
+  --color-foreground: var(--color-vellum);
+  --color-foreground-muted: var(--color-slate-light);
+  --color-foreground-subtle: var(--color-slate);
+  --color-border: var(--color-ink-soft);
+  --color-accent: var(--color-vellum);
+  --color-accent-foreground: var(--color-ink);
 }
 
 /* Drift animation for received bottles - graceful, ink-spreading feel */

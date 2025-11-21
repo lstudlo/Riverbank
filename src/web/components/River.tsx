@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, animate } from "motion/react";
 import { useEffect } from "react";
-import { Bottle3D } from "./Bottle3D";
+import { Bottle2D } from "./Bottle2D";
 
 type RiverProps = {
 	isSending: boolean;
@@ -19,7 +19,7 @@ export function River({ isSending, isReceiving }: RiverProps) {
 		const y1 = 48 + Math.sin(offset) * amp;
 		const y2 = 48 + Math.sin(offset + 1) * amp;
 		const y3 = 48 + Math.sin(offset + 2) * amp;
-		return `M0,${y1} Q150,${y2 - 15} 300,${y1} T600,${y2} T900,${y3} T1200,${y1} L1200,96 L0,96 Z`;
+		return `M0,${y1} Q150,${y2 - 15} 300,${y1} T600,${y2} T900,${y3} T1200,${y1} L1200,144 L0,144 Z`;
 	});
 
 	const wavePath2 = useTransform(waveOffset2, (offset) => {
@@ -27,14 +27,14 @@ export function River({ isSending, isReceiving }: RiverProps) {
 		const y1 = 56 + Math.sin(offset) * amp;
 		const y2 = 56 + Math.sin(offset + 1.5) * amp;
 		const y3 = 56 + Math.sin(offset + 3) * amp;
-		return `M0,${y1} Q150,${y2 - 10} 300,${y1} T600,${y2} T900,${y3} T1200,${y1} L1200,96 L0,96 Z`;
+		return `M0,${y1} Q150,${y2 - 10} 300,${y1} T600,${y2} T900,${y3} T1200,${y1} L1200,144 L0,144 Z`;
 	});
 
 	const wavePath3 = useTransform(waveOffset3, (offset) => {
 		const amp = 6;
 		const y1 = 64 + Math.sin(offset) * amp;
 		const y2 = 64 + Math.sin(offset + 2) * amp;
-		return `M0,${y1} Q200,${y2 - 5} 400,${y1} T800,${y2} T1200,${y1} L1200,96 L0,96 Z`;
+		return `M0,${y1} Q200,${y2 - 5} 400,${y1} T800,${y2} T1200,${y1} L1200,144 L0,144 Z`;
 	});
 
 	// Animate waves continuously with different speeds
@@ -65,41 +65,46 @@ export function River({ isSending, isReceiving }: RiverProps) {
 	}, [waveOffset1, waveOffset2, waveOffset3]);
 
 	return (
-		<div className="relative w-full h-24 overflow-hidden">
-			{/* River SVG - animated wave patterns */}
+		<div className="relative w-full h-56 overflow-hidden">
+			{/* Back wave layer (behind bottle) */}
 			<svg
 				className="absolute inset-0 w-full h-full"
-				viewBox="0 0 1200 96"
+				viewBox="0 0 1200 144"
 				preserveAspectRatio="none"
 			>
 				<defs>
 					<linearGradient id="riverGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-						<stop offset="0%" stopColor="#1a1a1a" stopOpacity="0.05" />
-						<stop offset="50%" stopColor="#525252" stopOpacity="0.2" />
-						<stop offset="100%" stopColor="#0a0a0a" stopOpacity="0.4" />
-					</linearGradient>
-					<linearGradient
-						id="riverGradient2"
-						x1="0%"
-						y1="0%"
-						x2="0%"
-						y2="100%"
-					>
-						<stop offset="0%" stopColor="#3a3a3a" stopOpacity="0.1" />
-						<stop offset="100%" stopColor="#1a1a1a" stopOpacity="0.3" />
+						<stop offset="0%" stopColor="var(--color-foreground-muted)" stopOpacity="0.1" />
+						<stop offset="40%" stopColor="var(--color-foreground-muted)" stopOpacity="0.3" />
+						<stop offset="100%" stopColor="var(--color-foreground)" stopOpacity="0.5" />
 					</linearGradient>
 				</defs>
-
-				{/* Multiple wave layers for depth */}
+				{/* Back wave - behind the bottle */}
 				<motion.path d={wavePath1} fill="url(#riverGradient)" />
-				<motion.path d={wavePath2} fill="url(#riverGradient2)" opacity={0.6} />
-				<motion.path d={wavePath3} fill="url(#riverGradient)" opacity={0.4} />
 			</svg>
 
-			{/* 3D Floating bottle */}
+			{/* 2D Floating bottle - in the middle layer */}
 			<div className="absolute inset-0 pointer-events-none">
-				<Bottle3D isSending={isSending} isReceiving={isReceiving} />
+				<Bottle2D isSending={isSending} isReceiving={isReceiving} />
 			</div>
+
+			{/* Front wave layers (in front of bottle) */}
+			<svg
+				className="absolute inset-0 w-full h-full pointer-events-none"
+				viewBox="0 0 1200 144"
+				preserveAspectRatio="none"
+			>
+				<defs>
+					<linearGradient id="riverGradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+						<stop offset="0%" stopColor="var(--color-foreground-muted)" stopOpacity="0.15" />
+						<stop offset="100%" stopColor="var(--color-foreground)" stopOpacity="0.4" />
+					</linearGradient>
+				</defs>
+				{/* Middle wave - slightly in front */}
+				<motion.path d={wavePath2} fill="url(#riverGradient2)" opacity={0.7} />
+				{/* Front wave - most in front */}
+				<motion.path d={wavePath3} fill="url(#riverGradient)" opacity={0.5} />
+			</svg>
 		</div>
 	);
 }
