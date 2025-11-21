@@ -19,7 +19,9 @@
 		{
 			"binding": "DB",
 			"database_name": "riverbank-db-uat",
-			"database_id": "8b6226a2-b886-44f8-9218-fb2feee58967"
+			"database_id": "24791cb1-c313-48b2-920f-ab2255dd48f6",
+			"migrations_table": "_migrations",
+			"migrations_dir": "migrations"
 		}
 	],
 	"workers_dev": true,
@@ -30,17 +32,21 @@
 				{
 					"binding": "DB",
 					"database_name": "riverbank-db-uat",
-					"database_id": "8b6226a2-b886-44f8-9218-fb2feee58967"
+					"database_id": "24791cb1-c313-48b2-920f-ab2255dd48f6",
+					"migrations_table": "_migrations",
+					"migrations_dir": "migrations"
 				}
 			]
 		},
-		"production": {
+		"pro": {
 			"name": "riverbank-day",
 			"d1_databases": [
 				{
 					"binding": "DB",
 					"database_name": "riverbank-db",
-					"database_id": "f1d6438e-9346-4a40-824d-d8a02acb85b4"
+					"database_id": "f1d6438e-9346-4a40-824d-d8a02acb85b4",
+					"migrations_table": "_migrations",
+					"migrations_dir": "migrations"
 				}
 			]
 		}

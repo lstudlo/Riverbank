@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, animate } from "motion/react";
 import { useEffect } from "react";
-import { Bottle2D } from "./Bottle2D";
+import { Bottle2D } from "./bottle-2d";
 
 type RiverProps = {
 	isSending: boolean;

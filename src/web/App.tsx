@@ -10,10 +10,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { River } from "@/components/River";
-import { WavyText } from "@/components/WavyText";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { UserButton } from "@/components/user-button";
+import { River } from "@/components/river";
+import { WavyText } from "@/components/wavy-text";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
 import { Flag, Send, Heart } from "lucide-react";
 
 type ReceivedBottle = {
@@ -173,14 +173,7 @@ function App() {
 
 	return (
 		<div className="min-h-screen bg-background font-sans flex flex-col transition-colors">
-			{/* Fixed Header */}
-			<header className="h-12 flex items-center justify-between border-b border-border shrink-0 px-4">
-				<ThemeToggle />
-				<h1 className="text-xl font-serif font-light text-foreground tracking-wide">
-					Riverbank
-				</h1>
-				<UserButton />
-			</header>
+			<Header />
 
 			{/* Main Content */}
 			<main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
@@ -214,12 +207,12 @@ function App() {
 
 							<div className="flex justify-between items-center text-xs text-muted-foreground mt-2">
 								<span className="text-muted-foreground">
-									{message.length < minChars && message.length > 0 && (
+									{message.trim().length < minChars && message.trim().length > 0 && (
 										<span className="text-amber-600">Min {minChars} chars</span>
 									)}
-									{message.length >= 151 && <span className="text-green-600">3 bottles</span>}
-									{message.length >= 61 && message.length < 151 && <span className="text-blue-600">2 bottles</span>}
-									{message.length >= minChars && message.length < 61 && <span>1 bottle</span>}
+									{message.trim().length >= 151 && <span className="text-green-600">3 bottles</span>}
+									{message.trim().length >= 61 && message.trim().length < 151 && <span className="text-blue-600">2 bottles</span>}
+									{message.trim().length >= minChars && message.trim().length < 61 && <span>1 bottle</span>}
 								</span>
 								<span className={charsRemaining < 30 ? "text-red-600" : ""}>
 									{message.length} / 300
@@ -361,15 +354,7 @@ function App() {
 			<div className="relative shrink-0">
 				<River isSending={showThrowAnimation} isReceiving={showReceiveAnimation} />
 
-				{/* Footer overlaid on river */}
-				<footer className="absolute bottom-0 left-0 right-0 h-12 flex items-center justify-center bg-transparent">
-					<div className="flex items-center gap-4 text-background text-xs">
-						<span>&copy; {new Date().getFullYear()} Riverbank</span>
-						<span className="opacity-60">|</span>
-						<a href="/terms" className="hover:opacity-80 transition-opacity">Terms</a>
-						<a href="/privacy" className="hover:opacity-80 transition-opacity">Privacy</a>
-					</div>
-				</footer>
+				<Footer />
 			</div>
 		</div>
 	);
