@@ -12,7 +12,9 @@ export default defineConfig({
 			generatedRouteTree: "./src/web/routeTree.gen.ts",
 		}),
 		react(),
-		cloudflare(),
+		cloudflare({
+			persistState: true,
+		}),
 		tailwindcss(),
 	],
 	resolve: {
