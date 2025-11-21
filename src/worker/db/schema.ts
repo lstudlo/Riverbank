@@ -15,3 +15,17 @@ export const todos = sqliteTable("todos", {
 
 export type Todo = typeof todos.$inferSelect;
 export type NewTodo = typeof todos.$inferInsert;
+
+export const bottles = sqliteTable("bottles", {
+	id: integer("id").primaryKey({ autoIncrement: true }),
+	message: text("message").notNull(),
+	nickname: text("nickname"),
+	country: text("country"),
+	status: text("status").notNull().default("active"),
+	created_at: integer("created_at", { mode: "timestamp" })
+		.notNull()
+		.default(sql`(unixepoch())`),
+});
+
+export type Bottle = typeof bottles.$inferSelect;
+export type NewBottle = typeof bottles.$inferInsert;

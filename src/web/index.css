@@ -1,1 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
+
+@theme {
+  /* Monochrome color palette - ink, vellum, slate */
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #1a1a1a;
+  --color-slate: #525252;
+  --color-slate-light: #a3a3a3;
+  --color-vellum: #faf9f6;
+  --color-vellum-dark: #f0efe8;
+
+  /* Typography - Classical serif + geometric sans */
+  --font-serif: "Playfair Display", Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Drift animation for received bottles - graceful, ink-spreading feel */
+@keyframes drift-in {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) rotate(-1deg);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(5px) rotate(0.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes drift-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    opacity: 0.6;
+    transform: translateY(-10px) scale(0.98);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.92);
+  }
+}
+
+/* Leaf floating downstream - slow, deliberate motion */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-3px) rotate(0.5deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(-0.5deg);
+  }
+}
+
+.animate-drift-in {
+  animation: drift-in 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.animate-drift-out {
+  animation: drift-out 1.0s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+/* Bottle bobbing animation - gentle up/down floating */
+@keyframes bottle-bob {
+  0%, 100% {
+    transform: translateY(0px) rotate(45deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(48deg);
+  }
+}
+
+.animate-bottle-bob {
+  animation: bottle-bob 3s ease-in-out infinite;
+}
+
+/* Bottle drift animations - horizontal movement */
+@keyframes bottle-drift-in-anim {
+  0% {
+    left: -10%;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    left: 50%;
+    opacity: 1;
+  }
+}
+
+@keyframes bottle-drift-out-anim {
+  0% {
+    left: 50%;
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    left: 110%;
+    opacity: 0;
+  }
+}
+
+.animate-bottle-drift-in {
+  animation: bottle-drift-in-anim 1.5s ease-out forwards;
+  transform: translateX(-50%);
+}
+
+.animate-bottle-drift-out {
+  animation: bottle-drift-out-anim 1.2s ease-in forwards;
+  transform: translateX(-50%);
+}
+
+.bottle-center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* River wave animations */
+@keyframes wave {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-300px);
+  }
+}
+
+@keyframes wave-slow {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-200px);
+  }
+}
+
+.animate-wave {
+  animation: wave 8s linear infinite;
+}
+
+.animate-wave-slow {
+  animation: wave-slow 12s linear infinite;
+}
