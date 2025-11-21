@@ -132,7 +132,7 @@ Frontend-specific configuration:
   "tsx": true,
   "tailwind": {
     "config": "",
-    "css": "src/web/index.css",
+    "css": "src/web/index.css.old",
     "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""

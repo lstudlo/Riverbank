@@ -13,7 +13,8 @@ import {
 import { River } from "@/components/River";
 import { WavyText } from "@/components/WavyText";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Flag, Send, User } from "lucide-react";
+import { UserButton } from "@/components/user-button";
+import { Flag, Send } from "lucide-react";
 
 type ReceivedBottle = {
 	id: string;
@@ -155,25 +156,20 @@ function App() {
 				<h1 className="text-xl font-serif font-light text-foreground tracking-wide">
 					Riverbank
 				</h1>
-				<button
-					className="p-2 rounded-md bg-background-secondary text-foreground hover:opacity-80 transition-opacity"
-					aria-label="User login"
-				>
-					<User className="h-5 w-5" />
-				</button>
+				<UserButton />
 			</header>
 
 			{/* Main Content */}
 			<main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
 				<div className="w-full max-w-lg">
 					{/* Tagline */}
-					<p className="text-foreground-subtle text-sm text-center mb-8">
+					<p className="text-muted-foreground text-sm text-center mb-8">
 						Throw a thought, receive a thought
 					</p>
 
 					{/* Composition Area */}
 					<motion.div
-						className="bg-background-secondary rounded-lg p-6 mb-8"
+						className="rounded-lg mb-8"
 						animate={{
 							opacity: showThrowAnimation ? 0.4 : 1,
 							y: showThrowAnimation ? -10 : 0,
@@ -184,66 +180,71 @@ function App() {
 							ease: [0.25, 0.1, 0.25, 1],
 						}}
 					>
-						<Textarea
-							placeholder="Write your message..."
-							value={message}
-							onChange={(e) => setMessage(e.target.value.slice(0, 280))}
-							disabled={loading}
-							className="font-serif text-lg text-foreground bg-background border-0 shadow-none resize-none min-h-[120px] focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-foreground-subtle"
-						/>
-
-						<div className="flex justify-between items-center text-sm text-foreground-muted mt-2 mb-4">
-							<span className={charsRemaining < 30 ? "text-red-600" : ""}>
-								{charsRemaining} characters remaining
-							</span>
-						</div>
-
-						{/* Optional metadata */}
-						<div className="flex gap-3 mb-4">
-							<Input
-								type="text"
-								placeholder="Nickname (optional)"
-								value={nickname}
-								onChange={(e) => setNickname(e.target.value.slice(0, 30))}
+						<div className="p-2 border-[1px] rounded-t-xl">
+							<Textarea
+								placeholder="Write your message..."
+								value={message}
+								onChange={(e) => setMessage(e.target.value.slice(0, 256))}
 								disabled={loading}
-								className="flex-1 text-sm shadow-none bg-background border-border text-foreground placeholder:text-foreground-subtle"
+								className="font-serif text-foreground bg-background dark:bg-background border-0 shadow-none resize-none min-h-[120px]"
 							/>
-							<Select value={country} onValueChange={setCountry} disabled={loading}>
-								<SelectTrigger className="flex-1 text-sm shadow-none bg-background border-border text-foreground">
-									<SelectValue placeholder="Country (optional)" />
-								</SelectTrigger>
-								<SelectContent>
-									{COUNTRIES.filter(c => c).map(c => (
-										<SelectItem key={c} value={c}>{c}</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
-
-						{/* Error display */}
-						{error && (
-							<div className="text-red-700 text-sm mb-4 p-3 bg-red-50 rounded">
-								{error}
+							
+							<div className="flex justify-end items-center text-xs text-muted-foreground mt-2">
+							<span className={charsRemaining < 30 ? "text-red-600" : ""}>
+								{message.length} / {charsRemaining}
+							</span>
 							</div>
-						)}
-
-						{/* Throw button */}
-						<Button
-							onClick={throwBottle}
-							disabled={loading || !message.trim()}
-							className="w-full bg-accent hover:opacity-90 text-accent-foreground font-medium py-6 text-lg transition-all"
-						>
-							{loading ? (
-								<span className="flex items-center gap-2">
+						</div>
+						
+						<div className={"border-[1px] border-t-0 rounded-b-xl h-20 flex flex-col"}>
+							
+							<div className="flex">
+								<Input
+									type="text"
+									placeholder="Nickname (optional)"
+									value={nickname}
+									onChange={(e) => setNickname(e.target.value.slice(0, 30))}
+									disabled={loading}
+									className="flex-1 rounded-none text-sm shadow-none border-0 border-b-[1px] border-r-[1px] bg-background border-border text-foreground placeholder:text-muted-foreground"
+								/>
+								<Select value={country} onValueChange={setCountry} disabled={loading}>
+									<SelectTrigger className="flex-1 rounded-none border-0 border-b-[1px] text-sm shadow-none bg-background border-border text-foreground">
+										<SelectValue placeholder="Country (optional)" />
+									</SelectTrigger>
+									<SelectContent>
+										{COUNTRIES.filter(c => c).map(c => (
+											<SelectItem key={c} value={c}>{c}</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+							
+							{/* Error display */}
+							{error && (
+								<div className="text-red-700 text-sm mb-4 p-3 bg-red-50 rounded">
+									{error}
+								</div>
+							)}
+							
+							{/* Throw button */}
+							<Button
+								onClick={throwBottle}
+								variant={"outline"}
+								disabled={loading || !message.trim()}
+								className="transition-all flex-1 rounded-xl rounded-t-none"
+							>
+								{loading ? (
+									<span className="flex items-center gap-2">
 									<span className="animate-pulse">Drifting...</span>
 								</span>
-							) : (
-								<span className="flex items-center gap-2">
+								) : (
+									<span className="flex items-center gap-2">
 									<Send className="w-5 h-5" />
 									Throw into the river
 								</span>
-							)}
-						</Button>
+								)}
+							</Button>
+						</div>
 					</motion.div>
 
 					{/* Received Bottle */}
@@ -251,7 +252,7 @@ function App() {
 						{showReceivedBottle && receivedBottle && (
 							<motion.div
 								key="received-bottle"
-								className="bg-background-secondary rounded-lg p-6"
+								className="bg-muted rounded-lg p-6 border-[1px]"
 								initial={{ opacity: 0, y: 40, scale: 0.96 }}
 								animate={{ opacity: 1, y: 0, scale: 1 }}
 								exit={{ opacity: 0, y: -30, scale: 0.96 }}
@@ -261,7 +262,7 @@ function App() {
 									opacity: { duration: 1.4, ease: [0.22, 1, 0.36, 1] }
 								}}
 							>
-								<div className="text-xs text-foreground-muted uppercase tracking-wider mb-3 flex justify-between items-center">
+								<div className="text-xs text-muted-foreground uppercase tracking-wider mb-3 flex justify-between items-center">
 									<span>A bottle washed ashore</span>
 									<span>#{receivedBottle.id_asc}</span>
 								</div>
@@ -271,20 +272,20 @@ function App() {
 								</p>
 
 								<div className="flex justify-between items-center">
-									<span className="text-sm text-foreground-muted italic">
+									<span className="text-sm text-muted-foreground italic">
 										{formatSender(receivedBottle)}
 									</span>
 
 									{!reportSuccess ? (
 										<button
 											onClick={reportBottle}
-											className="text-foreground-subtle hover:text-red-600 transition-colors p-2"
+											className="text-muted-foreground hover:text-red-600 transition-colors p-2"
 											title="Report inappropriate content"
 										>
 											<Flag className="w-4 h-4" />
 										</button>
 									) : (
-										<span className="text-xs text-foreground-subtle">Reported</span>
+										<span className="text-xs text-muted-foreground">Reported</span>
 									)}
 								</div>
 							</motion.div>
@@ -293,7 +294,7 @@ function App() {
 
 					{/* Empty pool state */}
 					{receivedBottle === null && !loading && message === "" && (
-						<div className="text-center text-foreground-subtle text-sm">
+						<div className="text-center text-muted-foreground text-sm">
 							<p className="mb-2">No bottles in the river yet.</p>
 							<p>Be the first to cast your thoughts into the current.</p>
 						</div>
