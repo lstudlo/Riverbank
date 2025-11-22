@@ -14,37 +14,40 @@ function containsURL(text: string): boolean {
 	return urlPatterns.some(pattern => pattern.test(text));
 }
 
-// AI content moderation using Llama Guard 3-8B
-async function moderateContent(ai: Ai, message: string): Promise<{ safe: boolean; categories?: string[] }> {
+// AI content moderation using GPT-OSS-20B
+async function moderateContent(ai: Ai, message: string): Promise<{ safe: boolean }> {
 	try {
 		const response = await ai.run("@cf/openai/gpt-oss-20b", {
-			messages: [
-				{
-					role: "user",
-					content: message
-				}
-			]
+			instructions: `Role: Content Safety Classifier for "Riverbank".
+Task: Evaluate the input text for safety violations.
+
+CRITERIA FOR VIOLATION (Output 1):
+1. Hate Speech: Slurs, discrimination, or dehumanization based on race, gender, religion, etc.
+2. Harassment: Threats, bullying, or personal attacks.
+3. NSFW/Violence: Sexual content, gore, or encouragement of self-harm.
+4. Spam/Scam: Commercial solicitation, bots, or fraudulent links.
+5. PII: Sharing phone numbers, addresses, or private data.
+
+CRITERIA FOR PASS (Output 0):
+- Safe, neutral, or positive content including personal reflections, stories, and greetings.
+
+OUTPUT FORMAT:
+Return ONLY the integer "0" (Pass) or "1" (Violation). Do not provide explanations.`,
+			input: message
 		}) as { response?: string };
 
-		const responseText = (response.response || "").trim().toLowerCase();
+		const responseText = (response.response || "").trim();
 
-		if (responseText.startsWith("safe")) {
+		// Parse response: "0" = Pass (safe), "1" = Violation (unsafe)
+		if (responseText === "0") {
 			return { safe: true };
+		} else if (responseText === "1") {
+			return { safe: false };
 		}
 
-		// Parse unsafe categories (format: "unsafe\nS1,S2,...")
-		const lines = responseText.split("\n");
-		const categories = lines.length > 1 ? lines[1].split(",").map(c => c.trim()) : [];
-
-		// Check if any flagged category is in our blocked list
-		// Blocked: S1, S2, S3, S4, S5, S7, S10, S11, S12
-		const blockedCategories = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "s12"];
-		const hasBlockedCategory = categories.some(cat => blockedCategories.includes(cat.toLowerCase()));
-
-		return {
-			safe: !hasBlockedCategory,
-			categories: categories
-		};
+		// If response is not "0" or "1", fail open (allow the message)
+		console.warn("Unexpected AI moderation response:", responseText);
+		return { safe: true };
 	} catch (error) {
 		// Fail open: if AI is unavailable, allow the message through
 		console.error("AI moderation failed:", error);
