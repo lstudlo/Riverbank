@@ -24,7 +24,7 @@ function TermsOfService() {
 				<div className="w-full max-w-3xl flex flex-col h-full flex-1">
 					<Link to="/">
 						<Button variant="ghost" className="mb-8 -ml-4 text-muted-foreground hover:text-foreground">
-							<ChevronLeftIcon className="mr-2 h-4 w-4" />
+							<ChevronLeftIcon size={16} className="mr-2 size-4" />
 							Back to Home
 						</Button>
 					</Link>

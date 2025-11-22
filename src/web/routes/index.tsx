@@ -251,7 +251,7 @@ function App() {
 							ease: [0.25, 0.1, 0.25, 1],
 						}}
 					>
-						<div className="p-2 border">
+						<div className="p-2 border-4 border-primary">
 							<Textarea
 								placeholder="Write your message..."
 								value={message}
@@ -262,7 +262,7 @@ function App() {
 									}
 								}}
 								disabled={loading}
-								className="font-serif text-foreground bg-background dark:bg-background border-0 shadow-none resize-none min-h-[120px]"
+								className="font-serif text-lg bg-background dark:bg-background border-0 shadow-none resize-none min-h-[120px]"
 							/>
 
 							<div className="flex justify-between items-center text-xs text-muted-foreground mt-2">
@@ -280,19 +280,19 @@ function App() {
 							</div>
 						</div>
 
-						<div className={"border-[1px] border-t-0 h-20 flex flex-col"}>
+						<div className={"border-4 border-t-0 border-primary h-auto flex flex-col"}>
 
-							<div className="flex">
+							<div className="flex border-2 border-primary border-t-0 border-l-0 border-r-0">
 								<Input
 									type="text"
 									placeholder="Nickname (optional)"
 									value={nickname}
 									onChange={(e) => setNickname(e.target.value.slice(0, 30))}
 									disabled={loading}
-									className="flex-1 rounded-none text-sm shadow-none border-0 border-b-[1px] border-r-[1px] bg-background border-border text-foreground placeholder:text-muted-foreground"
+									className="flex-1 rounded-none text-sm shadow-none border-0 border-r-2 bg-background border-primary text-foreground placeholder:text-muted-foreground"
 								/>
 								<Select value={country} onValueChange={setCountry} disabled={loading}>
-									<SelectTrigger className="flex-1 rounded-none border-0 border-b-[1px] text-sm shadow-none bg-background border-border text-foreground">
+									<SelectTrigger className="flex-1 rounded-none border-0 text-sm shadow-none bg-background border-border text-foreground">
 										<SelectValue placeholder="Country / Region (optional)" />
 									</SelectTrigger>
 									<SelectContent>
@@ -306,9 +306,9 @@ function App() {
 							{/* Throw button */}
 							<Button
 								onClick={throwBottle}
-								variant={"outline"}
+								variant={"default"}
 								disabled={loading || !canSubmit}
-								className="transition-all flex-1 rounded-none"
+								className="transition-all flex-1 rounded-none h-auto border-2 border-primary"
 							>
 								{loading ? (
 									<span className="flex items-center gap-2">
@@ -316,7 +316,7 @@ function App() {
 									</span>
 								) : (
 									<span className="flex items-center gap-2">
-										<TrendingDownIcon className="w-5 h-5" />
+										<TrendingDownIcon strokeWidth={3} className="size-7 text-muted" />
 										Throw into the river
 									</span>
 								)}
@@ -335,11 +335,11 @@ function App() {
 								className="mb-6"
 							>
 								<Alert className='rounded-none items-center [&>svg]:translate-y-0' variant="destructive">
-									<CircleAlertIcon className="size-4" />
+									<CircleAlertIcon size={16} className="size-4" />
 									<AlertDescription className='flex flex-row items-center justify-between w-full'>
 										{error.toLowerCase().includes("inappropriate") || error.toLowerCase().includes("content") ? (
 											<>
-												<span>Inappropriate content detected.</span>
+												<span>Inappropriate content.</span>
 												<Button
 													variant="outline"
 													size="sm"
@@ -398,7 +398,7 @@ function App() {
 													className={`flex items-center gap-1 transition-colors p-1 ${likedBottles.has(bottle.id) ? 'text-pink-500' : 'text-muted-foreground hover:text-pink-500'}`}
 													title="Like this message"
 												>
-													<HeartIcon className={`w-4 h-4 ${likedBottles.has(bottle.id) ? 'fill-current' : ''}`} />
+													<HeartIcon size={16} className={`size-4 ${likedBottles.has(bottle.id) ? 'fill-current' : ''}`} />
 													{bottle.like_count > 0 && (
 														<span className="text-xs">{bottle.like_count}</span>
 													)}
@@ -410,7 +410,7 @@ function App() {
 														className="text-muted-foreground hover:text-red-600 transition-colors p-1"
 														title="Report inappropriate content"
 													>
-														<BanIcon className="w-4 h-4" />
+														<BanIcon size={16} className="size-4" />
 													</button>
 												) : (
 													<span className="text-xs text-muted-foreground">Reported</span>
@@ -444,7 +444,7 @@ function App() {
 											{receivedBottles.map((bottle, index) => (
 												<CarouselItem key={bottle.id} className="pt-1">
 													<motion.article
-														className="bg-muted rounded-none p-4 border-[1px]"
+														className="border-2 border-primary rounded-none p-4"
 														initial={{ opacity: 0, scale: 0.96 }}
 														animate={{ opacity: 1, scale: 1 }}
 														transition={{
@@ -458,11 +458,11 @@ function App() {
 															<span>Bottle #{bottle.id_asc}</span>
 														</div>
 
-														<p className="font-serif text-lg text-foreground leading-relaxed mb-3">
+														<p className="font-serif font-bold text-lg text-foreground leading-relaxed mb-3">
 															<WavyText text={bottle.message} delay={index * 0.1} />
 														</p>
 
-														<footer className="text-sm text-muted-foreground italic mb-3">
+														<footer className="text-sm text-muted-foreground/75 italic mb-3">
 															{formatSender(bottle)}
 														</footer>
 
@@ -473,7 +473,7 @@ function App() {
 																className={`flex items-center gap-1 transition-colors p-1 ${likedBottles.has(bottle.id) ? 'text-pink-500' : 'text-muted-foreground hover:text-pink-500'}`}
 																title="Like this message"
 															>
-																<HeartIcon className={`w-4 h-4 ${likedBottles.has(bottle.id) ? 'fill-current' : ''}`} />
+																<HeartIcon size={16} className={`size-4 ${likedBottles.has(bottle.id) ? 'fill-current' : ''}`} />
 																{bottle.like_count > 0 && (
 																	<span className="text-xs">{bottle.like_count}</span>
 																)}
@@ -485,7 +485,7 @@ function App() {
 																	className="text-muted-foreground hover:text-red-600 transition-colors p-1"
 																	title="Report inappropriate content"
 																>
-																	<BanIcon className="w-4 h-4" />
+																	<BanIcon size={16} className="size-4" />
 																</button>
 															) : (
 																<span className="text-xs text-muted-foreground">Reported</span>
@@ -505,7 +505,7 @@ function App() {
 											disabled={!carouselApi?.canScrollPrev()}
 											className=""
 										>
-											<ChevronUpIcon className="h-4 w-4" />
+											<ChevronUpIcon size={16} className="size-4" />
 											<span className="sr-only">Previous bottle</span>
 										</Button>
 										<Button
@@ -515,7 +515,7 @@ function App() {
 											disabled={!carouselApi?.canScrollNext()}
 											className=""
 										>
-											<ChevronDownIcon className="h-4 w-4" />
+											<ChevronDownIcon size={16} className="size-4" />
 											<span className="sr-only">Next bottle</span>
 										</Button>
 									</div>
@@ -550,7 +550,7 @@ function App() {
 
 			{/* Community Guidelines Dialog */}
 			<AlertDialog open={showGuidelines} onOpenChange={setShowGuidelines}>
-				<AlertDialogContent>
+				<AlertDialogContent className='border-primary border-4'>
 					<AlertDialogHeader>
 						<AlertDialogTitle className='text-center'>Community Guidelines</AlertDialogTitle>
 						<AlertDialogDescription className="space-y-3 text-left">

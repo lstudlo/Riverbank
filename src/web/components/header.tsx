@@ -11,7 +11,7 @@ export function Header() {
 			<img
 				src="/banner-logo.svg"
 				alt="Riverbank"
-				className="h-7"
+				className="h-6"
 				style={{
 					filter: resolvedTheme === "dark" ? "invert(1) brightness(1.2)" : "none",
 				}}
