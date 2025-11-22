@@ -17,36 +17,55 @@ function containsURL(text: string): boolean {
 // AI content moderation using GPT-OSS-20B
 async function moderateContent(ai: Ai, message: string): Promise<{ safe: boolean }> {
 	try {
-		const response = await ai.run("@cf/openai/gpt-oss-20b", {
-			instructions: `Role: Content Safety Classifier for "Riverbank".
-Task: Evaluate the input text for safety violations.
+		const prompt = `Content moderation:
+		Return "1" if it contains: hate speech, harassment, NSFW, violence, self-harm, spam, scam, or PII.
+		Return "0" otherwise.
+		Output integer only. 
 
-CRITERIA FOR VIOLATION (Output 1):
-1. Hate Speech: Slurs, discrimination, or dehumanization based on race, gender, religion, etc.
-2. Harassment: Threats, bullying, or personal attacks.
-3. NSFW/Violence: Sexual content, gore, or encouragement of self-harm.
-4. Spam/Scam: Commercial solicitation, bots, or fraudulent links.
-5. PII: Sharing phone numbers, addresses, or private data.
+		MESSAGE TO EVALUATE:
+		${message}`;
 
-CRITERIA FOR PASS (Output 0):
-- Safe, neutral, or positive content including personal reflections, stories, and greetings.
+		//@ts-ignore
+		const response = await ai.run("@cf/meta/llama-3.1-8b-instruct-fp8-fast", {
+			input: prompt,
+			reasoning: {
+				effort: "low" // Faster responses with less reasoning overhead
+			}
+		}) as any;
 
-OUTPUT FORMAT:
-Return ONLY the integer "0" (Pass) or "1" (Violation). Do not provide explanations.`,
-			input: message
-		}) as { response?: string };
+		// Parse the response from GPT-OSS-20B
+		let responseText = "";
 
-		const responseText = (response.response || "").trim();
+		if (response?.output && Array.isArray(response.output)) {
+			// Find the message item in the output array
+			const messageItem = response.output.find((item: any) => item.type === "message");
+			if (messageItem?.content && Array.isArray(messageItem.content)) {
+				// Extract text from the content array
+				const textItem = messageItem.content.find((c: any) => c.type === "output_text");
+				if (textItem?.text) {
+					responseText = String(textItem.text).trim();
+				}
+			}
+		} else if (typeof response === "string") {
+			responseText = response.trim();
+		} else if (response?.response) {
+			responseText = String(response.response).trim();
+		} else if (response?.choices && Array.isArray(response.choices)) {
+			// Handle OpenAI-style response format
+			responseText = String(response.choices[0]?.message?.content || "").trim();
+		}
 
 		// Parse response: "0" = Pass (safe), "1" = Violation (unsafe)
 		if (responseText === "0") {
+			console.log(`AI moderation: PASS (tokens: ${response.usage?.total_tokens || 'N/A'})`);
 			return { safe: true };
 		} else if (responseText === "1") {
+			console.log(`AI moderation: VIOLATION (tokens: ${response.usage?.total_tokens || 'N/A'})`);
 			return { safe: false };
 		}
 
 		// If response is not "0" or "1", fail open (allow the message)
-		console.warn("Unexpected AI moderation response:", responseText);
+		console.warn(`AI moderation: UNEXPECTED response="${responseText}" - failing open`);
 		return { safe: true };
 	} catch (error) {
 		// Fail open: if AI is unavailable, allow the message through
@@ -101,8 +120,6 @@ app.post("/api/bottles/throw", async (c) => {
 
 	// AI content moderation
 	const moderation = await moderateContent(c.env.AI, trimmedMessage);
-
-	console.log(moderation)
 
 	if (!moderation.safe) {
 		return c.json({ error: "Your message contains inappropriate content and cannot be sent" }, 400);

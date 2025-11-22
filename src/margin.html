@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdSense Revenue Estimator</title>
+    <style>
+        /* --- RESET & BASICS --- */
+        :root {
+            --bg-color: #0a0a0a;
+            --card-bg: #111111;
+            --accent-red: #ff1f1f;
+            --accent-dim: #5c0b0b;
+            --text-main: #e0e0e0;
+            --text-muted: #666;
+            --font-family: 'Courier New', Courier, monospace; /* Tech/Cyber feel */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .dashboard {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+            border-radius: 4px;
+            border: 1px solid #222;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative Red Stripe */
+        .dashboard::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-red);
+            box-shadow: 0 0 10px var(--accent-red);
+        }
+
+        h1 {
+            font-weight: 200;
+            letter-spacing: 2px;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+
+        /* --- METRIC DISPLAY --- */
+        .metric-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            align-items: flex-end;
+        }
+
+        .label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .value-display {
+            font-family: var(--font-family);
+            font-size: 48px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .sub-value {
+            font-family: var(--font-family);
+            font-size: 14px;
+            color: var(--accent-red);
+            margin-bottom: 40px;
+            text-align: right;
+            opacity: 0.8;
+        }
+
+        /* --- SLIDER STYLING (The "Dragger") --- */
+        .slider-container {
+            margin: 50px 0;
+            position: relative;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]:focus { outline: none; }
+
+        /* The Track */
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 2px;
+            cursor: pointer;
+            background: #333;
+            border-radius: 0px;
+        }
+        
+        /* The Thumb (Dragger) */
+        input[type=range]::-webkit-slider-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -9px; /* centers thumb on track */
+            box-shadow: 0 0 15px var(--accent-red);
+            transition: transform 0.1s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Firefox styles */
+        input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 2px;
+            cursor: pointer;
+            background: #333;
+        }
+        input[type=range]::-moz-range-thumb {
+            height: 20px;
+            width: 20px;
+            border: none;
+            border-radius: 50%;
+            background: var(--accent-red);
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--accent-red);
+        }
+
+        /* --- SCENARIO SELECTOR --- */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .scenario-btn {
+            background: transparent;
+            border: 1px solid #333;
+            color: var(--text-muted);
+            padding: 15px 0;
+            cursor: pointer;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .scenario-btn:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+
+        .scenario-btn.active {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(255, 31, 31, 0.3);
+        }
+
+        /* --- FOOTER --- */
+        .footer-info {
+            margin-top: 30px;
+            font-size: 10px;
+            color: #444;
+            text-align: center;
+            border-top: 1px solid #222;
+            padding-top: 20px;
+            line-height: 1.5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <h1>Traffic & Revenue Simulator</h1>
+
+        <div class="metric-group">
+            <span class="label">Monthly Active Users</span>
+        </div>
+        <div class="value-display" id="mauDisplay">500,000</div>
+        
+        <div class="slider-container">
+            <input type="range" id="mauSlider" min="10000" max="5000000" value="500000" step="10000">
+        </div>
+
+        <div class="metric-group">
+            <span class="label">Est. Monthly Revenue</span>
+        </div>
+        <div class="value-display" style="color: var(--accent-red);" id="revDisplay">$12,600</div>
+        <div class="sub-value" id="ntdDisplay">≈ NT$ 409,500</div>
+
+        <div class="controls">
+            <button class="scenario-btn" onclick="setScenario('low')">
+                Tier 3 / Blog<br><span style="font-size:9px; opacity:0.7;">RPM $2</span>
+            </button>
+            <button class="scenario-btn active" onclick="setScenario('mid')">
+                Standard / Tech<br><span style="font-size:9px; opacity:0.7;">RPM $7</span>
+            </button>
+            <button class="scenario-btn" onclick="setScenario('high')">
+                Finance / SaaS<br><span style="font-size:9px; opacity:0.7;">RPM $25</span>
+            </button>
+        </div>
+
+        <div class="footer-info">
+            Formula: (MAU × 1.5 Visits × 2.5 Pages) ÷ 1000 × RPM<br>
+            Based on average Google AdSense Fill Rates & Viewability.
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const exchangeRate = 32.5; // USD to NTD
+        const scenarios = {
+            low: { rpm: 2.0, visits: 1.1, pages: 1.3 },    // Quick read, low value
+            mid: { rpm: 7.0, visits: 1.5, pages: 2.5 },    // Standard engagement
+            high: { rpm: 25.0, visits: 2.5, pages: 4.0 }   // Sticky, high value
+        };
+
+        let currentScenario = 'mid';
+
+        // DOM Elements
+        const slider = document.getElementById('mauSlider');
+        const mauDisplay = document.getElementById('mauDisplay');
+        const revDisplay = document.getElementById('revDisplay');
+        const ntdDisplay = document.getElementById('ntdDisplay');
+        const btns = document.querySelectorAll('.scenario-btn');
+
+        // Formatting numbers
+        const formatNumber = (num) => {
+            return new Intl.NumberFormat('en-US').format(num);
+        };
+
+        const formatCurrency = (num) => {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+        };
+
+        const formatNTD = (num) => {
+            return "≈ NT$ " + new Intl.NumberFormat('en-US').format(Math.round(num));
+        };
+
+        // Calculation Logic
+        function calculate() {
+            const mau = parseInt(slider.value);
+            const s = scenarios[currentScenario];
+
+            // Logic: MAU * Visits/User * Pages/Visit = Total Pageviews
+            const totalPageViews = mau * s.visits * s.pages;
+            
+            // Logic: (Pageviews / 1000) * RPM
+            const revenueUSD = (totalPageViews / 1000) * s.rpm;
+            const revenueNTD = revenueUSD * exchangeRate;
+
+            // Update UI
+            mauDisplay.textContent = formatNumber(mau);
+            revDisplay.textContent = formatCurrency(revenueUSD);
+            ntdDisplay.textContent = formatNTD(revenueNTD);
+        }
+
+        // Scenario Switcher
+        function setScenario(type) {
+            currentScenario = type;
+            
+            // Update buttons visual state
+            btns.forEach(btn => btn.classList.remove('active'));
+            // Simple index matching for brevity in this demo
+            if(type === 'low') btns[0].classList.add('active');
+            if(type === 'mid') btns[1].classList.add('active');
+            if(type === 'high') btns[2].classList.add('active');
+
+            calculate();
+        }
+
+        // Event Listeners
+        slider.addEventListener('input', calculate);
+
+        // Init
+        calculate();
+    </script>
+</body>
+</html>
