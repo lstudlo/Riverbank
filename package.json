@@ -21,8 +21,9 @@
 		"db:migrations:list": "wrangler d1 migrations list DB --local",
 		"db:migrations:list:uat": "wrangler d1 migrations list DB --env uat --remote",
 		"db:migrations:list:pro": "wrangler d1 migrations list DB --env pro --remote",
-		"db:studio:local": "drizzle-kit studio --config drizzle.config.local.ts",
-		"db:studio:remote": "drizzle-kit studio --config drizzle.config.ts"
+		"db:studio": "drizzle-kit studio --config drizzle.config.local.ts",
+		"db:studio:uat": "drizzle-kit studio --config drizzle.config.uat.ts",
+		"db:studio:pro": "drizzle-kit studio --config drizzle.config.pro.ts"
 	},
 	"cloudflare": {
 		"label": "Vite React Template",

@@ -25,17 +25,18 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { River } from "@/components/river";
 import { WavyText } from "@/components/wavy-text";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { AboutSection } from "@/components/about-section";
-import { Flag, Send, Heart, ChevronUp, ChevronDown } from "lucide-react";
+import { Flag, Send, Heart, ChevronUp, ChevronDown, AlertCircle } from "lucide-react";
 import countriesData from "@/lib/data/countries.json";
 import { useConsentStore } from "@/stores/consent-store";
 
 export const Route = createFileRoute('/')({
-  component: App,
+	component: App,
 })
 
 type ReceivedBottle = {
@@ -69,10 +70,12 @@ function App() {
 	const [reportedBottles, setReportedBottles] = useState<Set<string>>(new Set());
 	const [carouselApi, setCarouselApi] = useState<CarouselApi>();
 	const [showGuidelines, setShowGuidelines] = useState(false);
+	const [showFalsePositiveDialog, setShowFalsePositiveDialog] = useState(false);
+	const [submittingFalsePositive, setSubmittingFalsePositive] = useState(false);
 
 	// Set document title
 	useEffect(() => {
-		document.title = "Riverbank - Cast Your Message into the Digital River";
+		document.title = "Riverbank - Bottle a thought. Let it drift.";
 	}, []);
 
 	const charsRemaining = 300 - message.length;
@@ -195,6 +198,31 @@ function App() {
 		return "from a stranger";
 	};
 
+	const submitFalsePositiveReport = async () => {
+		setSubmittingFalsePositive(true);
+		try {
+			const response = await fetch("/api/false-positive", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					message: message.trim(),
+					nickname: nickname.trim() || undefined,
+					country: country || undefined,
+				}),
+			});
+
+			if (response.ok) {
+				setShowFalsePositiveDialog(false);
+				// Optionally clear the error and allow retry
+				setError(null);
+			}
+		} catch (err) {
+			console.error("Failed to submit false positive report:", err);
+		} finally {
+			setSubmittingFalsePositive(false);
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-background font-sans flex flex-col transition-colors">
 			<Header />
@@ -251,9 +279,9 @@ function App() {
 								</span>
 							</div>
 						</div>
-						
+
 						<div className={"border-[1px] border-t-0 rounded-b-xl h-20 flex flex-col"}>
-							
+
 							<div className="flex">
 								<Input
 									type="text"
@@ -274,14 +302,7 @@ function App() {
 									</SelectContent>
 								</Select>
 							</div>
-							
-							{/* Error display */}
-							{error && (
-								<div className="text-red-700 text-sm mb-4 p-3 bg-red-50 rounded">
-									{error}
-								</div>
-							)}
-							
+
 							{/* Throw button */}
 							<Button
 								onClick={throwBottle}
@@ -291,17 +312,45 @@ function App() {
 							>
 								{loading ? (
 									<span className="flex items-center gap-2">
-									<span className="animate-pulse">Drifting...</span>
-								</span>
+										<span className="animate-pulse">Drifting...</span>
+									</span>
 								) : (
 									<span className="flex items-center gap-2">
-									<Send className="w-5 h-5" />
-									Throw into the river
-								</span>
+										<Send className="w-5 h-5" />
+										Throw into the river
+									</span>
 								)}
 							</Button>
 						</div>
 					</motion.div>
+
+					{/* Error Alert */}
+					<AnimatePresence>
+						{error && (
+							<motion.div
+								initial={{ opacity: 0, y: -10 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -10 }}
+								transition={{ duration: 0.3 }}
+								className="mb-6"
+							>
+								<Alert className='rounded-2xl' variant="destructive">
+									<AlertCircle className="size-4" />
+									<AlertDescription className='flex flex-row items-center justify-between w-full'>
+										<span>Inappropriate content detected.</span>
+										<Button
+											variant="outline"
+											size="sm"
+											onClick={() => setShowFalsePositiveDialog(true)}
+											className="ml-4"
+										>
+											Report Error
+										</Button>
+									</AlertDescription>
+								</Alert>
+							</motion.div>
+						)}
+					</AnimatePresence>
 
 					{/* Received Bottles */}
 					<AnimatePresence>
@@ -524,15 +573,54 @@ function App() {
 							</p>
 						</AlertDialogDescription>
 					</AlertDialogHeader>
-          <AlertDialogAction
-							className=''
-							onClick={() => {
-								acceptGuidelines();
-								setShowGuidelines(false);
-							}}
+					<AlertDialogAction
+						className=''
+						onClick={() => {
+							acceptGuidelines();
+							setShowGuidelines(false);
+						}}
+					>
+						Accept
+					</AlertDialogAction>
+				</AlertDialogContent>
+			</AlertDialog>
+
+			{/* False Positive Report Dialog */}
+			<AlertDialog open={showFalsePositiveDialog} onOpenChange={setShowFalsePositiveDialog}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Report False Detection</AlertDialogTitle>
+						<AlertDialogDescription className="space-y-4">
+							<p>
+								If you believe your message was incorrectly flagged as inappropriate, you can report it for review.
+							</p>
+							<div className="bg-muted p-4 rounded-lg space-y-2">
+								<p className="font-medium text-sm text-foreground">Your Message:</p>
+								<p className="font-serif text-foreground italic">"{message}"</p>
+								{nickname && (
+									<p className="text-sm text-muted-foreground">Nickname: {nickname}</p>
+								)}
+								{country && (
+									<p className="text-sm text-muted-foreground">Country: {country}</p>
+								)}
+							</div>
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<div className="flex justify-end gap-3">
+						<Button
+							variant="outline"
+							onClick={() => setShowFalsePositiveDialog(false)}
+							disabled={submittingFalsePositive}
 						>
-							Accept
+							Cancel
+						</Button>
+						<AlertDialogAction
+							onClick={submitFalsePositiveReport}
+							disabled={submittingFalsePositive}
+						>
+							{submittingFalsePositive ? "Submitting..." : "Submit"}
 						</AlertDialogAction>
+					</div>
 				</AlertDialogContent>
 			</AlertDialog>
 		</div>

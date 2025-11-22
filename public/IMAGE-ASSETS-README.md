@@ -14,7 +14,7 @@ This folder contains SVG placeholder images for social sharing and favicons. For
    - Create a 1200x630px canvas
    - Design your social preview with:
      - "Riverbank" branding
-     - Tagline: "Cast Your Message into the Digital River"
+     - Tagline: "Bottle a thought. Let it drift."
      - Visual elements (water, bottles, etc.)
    - Export as PNG
 

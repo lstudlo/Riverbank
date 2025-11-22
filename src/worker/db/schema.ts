@@ -18,3 +18,17 @@ export const bottles = sqliteTable("bottles", {
 
 export type Bottle = typeof bottles.$inferSelect;
 export type NewBottle = typeof bottles.$inferInsert;
+
+export const falsePositiveReports = sqliteTable("false_positive_reports", {
+	id: text("id").primaryKey(),
+	message: text("message").notNull(),
+	nickname: text("nickname"),
+	country: text("country"),
+	ip: text("ip"),
+	created_at: integer("created_at", { mode: "timestamp" })
+		.notNull()
+		.default(sql`(unixepoch())`),
+});
+
+export type FalsePositiveReport = typeof falsePositiveReports.$inferSelect;
+export type NewFalsePositiveReport = typeof falsePositiveReports.$inferInsert;
