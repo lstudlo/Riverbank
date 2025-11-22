@@ -25,7 +25,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { River } from "@/components/river";
 import { WavyText } from "@/components/wavy-text";
 import { Header } from "@/components/header";
@@ -334,18 +334,24 @@ function App() {
 								transition={{ duration: 0.3 }}
 								className="mb-6"
 							>
-								<Alert className='rounded-2xl' variant="destructive">
+								<Alert className='rounded-2xl items-center [&>svg]:translate-y-0' variant="destructive">
 									<AlertCircle className="size-4" />
 									<AlertDescription className='flex flex-row items-center justify-between w-full'>
-										<span>Inappropriate content detected.</span>
-										<Button
-											variant="outline"
-											size="sm"
-											onClick={() => setShowFalsePositiveDialog(true)}
-											className="ml-4"
-										>
-											Report Error
-										</Button>
+										{error.toLowerCase().includes("inappropriate") || error.toLowerCase().includes("content") ? (
+											<>
+												<span>Inappropriate content detected.</span>
+												<Button
+													variant="outline"
+													size="sm"
+													onClick={() => setShowFalsePositiveDialog(true)}
+													className="ml-4"
+												>
+													Report Error
+												</Button>
+											</>
+										) : (
+											<span>{error}</span>
+										)}
 									</AlertDescription>
 								</Alert>
 							</motion.div>
