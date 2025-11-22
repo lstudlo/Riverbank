@@ -4,18 +4,52 @@ import { eq, ne, and, sql, max } from "drizzle-orm";
 import { getDb, bottles, type Bottle } from "./db";
 import { nanoid } from "nanoid";
 
-// Basic profanity word list
-const PROFANITY_LIST = [
-	"fuck", "shit", "ass", "bitch", "damn", "cunt", "dick", "cock", "pussy",
-	"bastard", "whore", "slut", "nigger", "faggot", "retard"
-];
+// URL/hyperlink detection to prevent scam sites
+function containsURL(text: string): boolean {
+	const urlPatterns = [
+		/https?:\/\//i,  // http:// or https://
+		/www\./i,        // www.
+		/\.(com|org|net|edu|gov|io|co|app|dev|xyz|info|biz|me|ai|tech|online|site|store|shop|blog|tv|cc|link|click|ly|gl|bit|tinyurl)\b/i  // common TLDs
+	];
+	return urlPatterns.some(pattern => pattern.test(text));
+}
 
-function containsProfanity(text: string): boolean {
-	const lowerText = text.toLowerCase();
-	return PROFANITY_LIST.some(word => {
-		const regex = new RegExp(`\\b${word}\\b`, "i");
-		return regex.test(lowerText);
-	});
+// AI content moderation using Llama Guard 3-8B
+async function moderateContent(ai: Ai, message: string): Promise<{ safe: boolean; categories?: string[] }> {
+	try {
+		const response = await ai.run("@cf/openai/gpt-oss-20b", {
+			messages: [
+				{
+					role: "user",
+					content: message
+				}
+			]
+		}) as { response?: string };
+
+		const responseText = (response.response || "").trim().toLowerCase();
+
+		if (responseText.startsWith("safe")) {
+			return { safe: true };
+		}
+
+		// Parse unsafe categories (format: "unsafe\nS1,S2,...")
+		const lines = responseText.split("\n");
+		const categories = lines.length > 1 ? lines[1].split(",").map(c => c.trim()) : [];
+
+		// Check if any flagged category is in our blocked list
+		// Blocked: S1, S2, S3, S4, S5, S7, S10, S11, S12
+		const blockedCategories = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "s12"];
+		const hasBlockedCategory = categories.some(cat => blockedCategories.includes(cat.toLowerCase()));
+
+		return {
+			safe: !hasBlockedCategory,
+			categories: categories
+		};
+	} catch (error) {
+		// Fail open: if AI is unavailable, allow the message through
+		console.error("AI moderation failed:", error);
+		return { safe: true };
+	}
 }
 
 const app = new Hono<{ Bindings: Env }>();
@@ -57,9 +91,18 @@ app.post("/api/bottles/throw", async (c) => {
 		bottlesToReceive = 2;
 	}
 
-	// Check for profanity
-	if (containsProfanity(trimmedMessage)) {
-		return c.json({ error: "Please revise your message - it contains inappropriate content" }, 400);
+	// Check for URLs/hyperlinks (fast-fail to prevent scam sites)
+	if (containsURL(trimmedMessage)) {
+		return c.json({ error: "Messages with links are not allowed" }, 400);
+	}
+
+	// AI content moderation
+	const moderation = await moderateContent(c.env.AI, trimmedMessage);
+
+	console.log(moderation)
+
+	if (!moderation.safe) {
+		return c.json({ error: "Your message contains inappropriate content and cannot be sent" }, 400);
 	}
 
 	// Validate nickname if provided

@@ -24,6 +24,9 @@
 			"migrations_dir": "migrations"
 		}
 	],
+	"ai": {
+		"binding": "AI"
+	},
 	"workers_dev": true,
 	"env": {
 		"uat": {
@@ -36,7 +39,10 @@
 					"migrations_table": "_migrations",
 					"migrations_dir": "migrations"
 				}
-			]
+			],
+			"ai": {
+				"binding": "AI"
+			}
 		},
 		"pro": {
 			"name": "riverbank-day",
@@ -48,7 +54,10 @@
 					"migrations_table": "_migrations",
 					"migrations_dir": "migrations"
 				}
-			]
+			],
+			"ai": {
+				"binding": "AI"
+			}
 		}
 	}
 }
