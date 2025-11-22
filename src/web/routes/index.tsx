@@ -31,7 +31,7 @@ import { WavyText } from "@/components/wavy-text";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { AboutSection } from "@/components/about-section";
-import { Flag, Send, Heart, ChevronUp, ChevronDown, AlertCircle } from "lucide-react";
+import { BanIcon, TrendingDownIcon, HeartIcon, ChevronUpIcon, ChevronDownIcon, CircleAlertIcon } from "raster-react";
 import countriesData from "@/lib/data/countries.json";
 import { useConsentStore } from "@/stores/consent-store";
 
@@ -234,7 +234,7 @@ function App() {
 					<h1 className="sr-only">Riverbank - Share Messages in Digital Bottles</h1>
 
 					{/* Tagline */}
-					<p className="text-foreground text-xs text-center mb-6">
+					<p className="text-foreground/50 text-md text-center mb-6">
 						Bottle a thought. Let it drift.
 					</p>
 
@@ -251,7 +251,7 @@ function App() {
 							ease: [0.25, 0.1, 0.25, 1],
 						}}
 					>
-						<div className="p-2 border-[1px] rounded-t-xl">
+						<div className="p-2 border">
 							<Textarea
 								placeholder="Write your message..."
 								value={message}
@@ -280,7 +280,7 @@ function App() {
 							</div>
 						</div>
 
-						<div className={"border-[1px] border-t-0 rounded-b-xl h-20 flex flex-col"}>
+						<div className={"border-[1px] border-t-0 h-20 flex flex-col"}>
 
 							<div className="flex">
 								<Input
@@ -308,7 +308,7 @@ function App() {
 								onClick={throwBottle}
 								variant={"outline"}
 								disabled={loading || !canSubmit}
-								className="transition-all flex-1 rounded-none rounded-t-none"
+								className="transition-all flex-1 rounded-none"
 							>
 								{loading ? (
 									<span className="flex items-center gap-2">
@@ -316,7 +316,7 @@ function App() {
 									</span>
 								) : (
 									<span className="flex items-center gap-2">
-										<Send className="w-5 h-5" />
+										<TrendingDownIcon className="w-5 h-5" />
 										Throw into the river
 									</span>
 								)}
@@ -335,7 +335,7 @@ function App() {
 								className="mb-6"
 							>
 								<Alert className='rounded-none items-center [&>svg]:translate-y-0' variant="destructive">
-									<AlertCircle className="size-4" />
+									<CircleAlertIcon className="size-4" />
 									<AlertDescription className='flex flex-row items-center justify-between w-full'>
 										{error.toLowerCase().includes("inappropriate") || error.toLowerCase().includes("content") ? (
 											<>
@@ -398,7 +398,7 @@ function App() {
 													className={`flex items-center gap-1 transition-colors p-1 ${likedBottles.has(bottle.id) ? 'text-pink-500' : 'text-muted-foreground hover:text-pink-500'}`}
 													title="Like this message"
 												>
-													<Heart className={`w-4 h-4 ${likedBottles.has(bottle.id) ? 'fill-current' : ''}`} />
+													<HeartIcon className={`w-4 h-4 ${likedBottles.has(bottle.id) ? 'fill-current' : ''}`} />
 													{bottle.like_count > 0 && (
 														<span className="text-xs">{bottle.like_count}</span>
 													)}
@@ -410,7 +410,7 @@ function App() {
 														className="text-muted-foreground hover:text-red-600 transition-colors p-1"
 														title="Report inappropriate content"
 													>
-														<Flag className="w-4 h-4" />
+														<BanIcon className="w-4 h-4" />
 													</button>
 												) : (
 													<span className="text-xs text-muted-foreground">Reported</span>
@@ -473,7 +473,7 @@ function App() {
 																className={`flex items-center gap-1 transition-colors p-1 ${likedBottles.has(bottle.id) ? 'text-pink-500' : 'text-muted-foreground hover:text-pink-500'}`}
 																title="Like this message"
 															>
-																<Heart className={`w-4 h-4 ${likedBottles.has(bottle.id) ? 'fill-current' : ''}`} />
+																<HeartIcon className={`w-4 h-4 ${likedBottles.has(bottle.id) ? 'fill-current' : ''}`} />
 																{bottle.like_count > 0 && (
 																	<span className="text-xs">{bottle.like_count}</span>
 																)}
@@ -485,7 +485,7 @@ function App() {
 																	className="text-muted-foreground hover:text-red-600 transition-colors p-1"
 																	title="Report inappropriate content"
 																>
-																	<Flag className="w-4 h-4" />
+																	<BanIcon className="w-4 h-4" />
 																</button>
 															) : (
 																<span className="text-xs text-muted-foreground">Reported</span>
@@ -503,9 +503,9 @@ function App() {
 											size="icon"
 											onClick={() => carouselApi?.scrollPrev()}
 											disabled={!carouselApi?.canScrollPrev()}
-											className="rounded-full"
+											className=""
 										>
-											<ChevronUp className="h-4 w-4" />
+											<ChevronUpIcon className="h-4 w-4" />
 											<span className="sr-only">Previous bottle</span>
 										</Button>
 										<Button
@@ -513,9 +513,9 @@ function App() {
 											size="icon"
 											onClick={() => carouselApi?.scrollNext()}
 											disabled={!carouselApi?.canScrollNext()}
-											className="rounded-full"
+											className=""
 										>
-											<ChevronDown className="h-4 w-4" />
+											<ChevronDownIcon className="h-4 w-4" />
 											<span className="sr-only">Next bottle</span>
 										</Button>
 									</div>

@@ -1,6 +1,5 @@
-import { Moon, Sun } from "lucide-react";
+import { MoonIcon, SunIcon } from "raster-react";
 import { useTheme } from "@/hooks/use-theme";
-import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -10,13 +9,12 @@ export function ThemeToggle() {
   };
 
   return (
-    <Button
-      variant="outline"
-      size="icon"
+    <button
+    className="hover:cursor-pointer"
       onClick={toggleTheme}
       aria-label={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
     >
-      {resolvedTheme === "dark" ? <Sun /> : <Moon />}
-    </Button>
+      {resolvedTheme === "dark" ? <SunIcon size={32} /> : <MoonIcon size={32}/>}
+    </button>
   );
 }

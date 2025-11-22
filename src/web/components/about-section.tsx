@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ChevronDownIcon, ChevronUpIcon } from "raster-react"
 import { motion, AnimatePresence } from "motion/react"
 
 export function AboutSection() {
@@ -14,7 +14,7 @@ export function AboutSection() {
 				aria-controls="about-content"
 			>
 				<span>How It Works</span>
-				{isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+				{isOpen ? <ChevronUpIcon className="w-4 h-4" /> : <ChevronDownIcon className="w-4 h-4" />}
 			</button>
 
 			<AnimatePresence>

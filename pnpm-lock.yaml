@@ -125,9 +125,6 @@ importers:
       input-otp:
         specifier: ^1.4.2
         version: 1.4.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      lucide-react:
-        specifier: ^0.554.0
-        version: 0.554.0(react@19.0.0)
       motion:
         specifier: ^12.23.24
         version: 12.23.24(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -137,6 +134,9 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      raster-react:
+        specifier: ^0.2.0
+        version: 0.2.0(react@19.0.0)
       react:
         specifier: 19.0.0
         version: 19.0.0
@@ -3202,11 +3202,6 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lucide-react@0.554.0:
-    resolution: {integrity: sha512-St+z29uthEJVx0Is7ellNkgTEhaeSoA42I7JjOCBCrc5X6LYMGSv0P/2uS5HDLTExP5tpiqRD2PyUEOS6s9UXA==}
-    peerDependencies:
-      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
-
   maath@0.10.8:
     resolution: {integrity: sha512-tRvbDF0Pgqz+9XUa4jjfgAQ8/aPKmQdWXilFu2tMy4GWj4NOsx99HlULO4IeREfbO3a0sA145DZYyvXPkybm0g==}
     peerDependencies:
@@ -3411,6 +3406,11 @@ packages:
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
+
+  raster-react@0.2.0:
+    resolution: {integrity: sha512-Lp0qDHfKIfXXYiNSOIZilh6pLV3TwJWNWNuRFpYM4/acIJfKJhoE+lRsvCSefLaQ56EQ6JJFLRVV/n1jbQJSEw==}
+    peerDependencies:
+      react: '>=16.8.0'
 
   rc@1.2.8:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
@@ -6798,10 +6798,6 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lucide-react@0.554.0(react@19.0.0):
-    dependencies:
-      react: 19.0.0
-
   maath@0.10.8(@types/three@0.181.0)(three@0.181.2):
     dependencies:
       '@types/three': 0.181.0
@@ -7000,6 +6996,10 @@ snapshots:
   punycode@2.3.1: {}
 
   queue-microtask@1.2.3: {}
+
+  raster-react@0.2.0(react@19.0.0):
+    dependencies:
+      react: 19.0.0
 
   rc@1.2.8:
     dependencies:

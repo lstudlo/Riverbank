@@ -1,10 +1,11 @@
-import { User } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { UserFillIcon } from "raster-react";
 
 export function UserButton() {
   return (
-    <Button variant="outline" size="icon" aria-label="User login">
-      <User />
-    </Button>
+    <button
+    className="hover:cursor-pointer"
+    >
+       <UserFillIcon size={32}/>
+    </button>
   );
 }

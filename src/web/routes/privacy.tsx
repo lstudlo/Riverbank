@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft } from "lucide-react"
+import { ChevronLeftIcon } from "raster-react"
 import privacyData from "@/lib/data/privacy.json"
 
 export const Route = createFileRoute('/privacy')({
@@ -24,7 +24,7 @@ function PrivacyPolicy() {
 				<div className="w-full max-w-3xl flex flex-col flex-1 min-h-0">
 					<Link to="/">
 						<Button variant="ghost" className="mb-8 -ml-4 text-muted-foreground hover:text-foreground">
-							<ChevronLeft className="mr-2 h-4 w-4" />
+							<ChevronLeftIcon className="mr-2 h-4 w-4" />
 							Back to Home
 						</Button>
 					</Link>
