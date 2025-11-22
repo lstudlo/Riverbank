@@ -74,8 +74,8 @@ export function River({ isSending, isReceiving }: RiverProps) {
 			>
 				<defs>
 					<linearGradient id="riverGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-						<stop offset="0%" stopColor="var(--color-foreground-muted)" stopOpacity="0.25" />
-						<stop offset="40%" stopColor="var(--color-foreground-muted)" stopOpacity="0.15" />
+						<stop offset="0%" stopColor="var(--color-muted-foreground)" stopOpacity="0.25" />
+						<stop offset="40%" stopColor="var(--color-muted-foreground)" stopOpacity="0.15" />
 						<stop offset="100%" stopColor="var(--color-foreground)" stopOpacity="0.25" />
 					</linearGradient>
 				</defs>
@@ -96,7 +96,7 @@ export function River({ isSending, isReceiving }: RiverProps) {
 			>
 				<defs>
 					<linearGradient id="riverGradient2" x1="0%" y1="0%" x2="0%" y2="100%">
-						<stop offset="0%" stopColor="var(--color-foreground-muted)" stopOpacity="0.5" />
+						<stop offset="0%" stopColor="var(--color-muted-foreground)" stopOpacity="0.5" />
 						<stop offset="100%" stopColor="var(--color-foreground)" stopOpacity="0.75" />
 					</linearGradient>
 				</defs>
