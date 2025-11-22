@@ -15,6 +15,7 @@ import { WavyText } from "@/components/wavy-text";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Flag, Send, Heart } from "lucide-react";
+import countriesData from "@/lib/data/countries.json";
 
 type ReceivedBottle = {
 	id: string;
@@ -31,14 +32,6 @@ type ThrowResponse = {
 	received: ReceivedBottle[];
 	error?: string;
 };
-
-const COUNTRIES = [
-	"", "Argentina", "Australia", "Brazil", "Canada", "China", "France",
-	"Germany", "India", "Italy", "Japan", "Mexico", "Netherlands", "New Zealand",
-	"Norway", "Poland", "Portugal", "Russia", "South Korea", "Spain", "Sweden",
-	"Switzerland", "Thailand", "Turkey", "Ukraine", "United Kingdom", "United States",
-	"Vietnam"
-];
 
 function App() {
 	const [message, setMessage] = useState("");
@@ -100,15 +93,14 @@ function App() {
 
 			// Wait for throw animation to complete (3s exit animation)
 			await new Promise(resolve => setTimeout(resolve, 3000));
-			setShowThrowAnimation(false);
 
 			if (data.received && data.received.length > 0) {
 				// Store data first (won't render yet)
 				setReceivedBottles(data.received);
 
-				// Small delay before receive animation starts
-				await new Promise(resolve => setTimeout(resolve, 200));
+				// Start receive animation immediately to prevent idle state flash
 				setShowReceiveAnimation(true);
+				setShowThrowAnimation(false);
 
 				// Wait for bottle to reach center before showing UI (sync with 3s animation)
 				await new Promise(resolve => setTimeout(resolve, 2800));
@@ -116,6 +108,9 @@ function App() {
 
 				// Reset receive animation state shortly after
 				setTimeout(() => setShowReceiveAnimation(false), 500);
+			} else {
+				// No bottles received, just end the animation
+				setShowThrowAnimation(false);
 			}
 		} catch (err) {
 			setError("Failed to connect to the river");
@@ -233,11 +228,11 @@ function App() {
 								/>
 								<Select value={country} onValueChange={setCountry} disabled={loading}>
 									<SelectTrigger className="flex-1 rounded-none border-0 border-b-[1px] text-sm shadow-none bg-background border-border text-foreground">
-										<SelectValue placeholder="Country (optional)" />
+										<SelectValue placeholder="Country / Region (optional)" />
 									</SelectTrigger>
 									<SelectContent>
-										{COUNTRIES.filter(c => c).map(c => (
-											<SelectItem key={c} value={c}>{c}</SelectItem>
+										{countriesData.map(c => (
+											<SelectItem key={c.code} value={c.name}>{c.name}</SelectItem>
 										))}
 									</SelectContent>
 								</Select>
@@ -342,7 +337,7 @@ function App() {
 
 					{/* Empty pool state */}
 					{receivedBottles.length === 0 && !loading && message === "" && (
-						<div className="text-center text-muted-foreground text-sm">
+						<div className="text-center text-muted-foreground/50 text-sm">
 							<p className="mb-2">No bottles in the river yet.</p>
 							<p>Be the first to cast your thoughts into the current.</p>
 						</div>

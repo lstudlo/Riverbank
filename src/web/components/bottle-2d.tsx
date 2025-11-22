@@ -10,7 +10,7 @@ export function Bottle2D({ isSending, isReceiving }: Bottle2DProps) {
   const state = isSending ? "sending" : isReceiving ? "receiving" : "idle";
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       {state === "sending" && (
         <motion.div
           key="sending"
@@ -18,9 +18,11 @@ export function Bottle2D({ isSending, isReceiving }: Bottle2DProps) {
           style={{ marginLeft: "-28px", marginTop: "-42px" }}
           initial={{ left: "50%" }}
           animate={{ left: "120%", rotate: [0, 5, -5, 3, -3, 0] }}
+          exit={{ left: "120%", opacity: 0 }}
           transition={{
             left: { duration: 3, ease: [0.25, 0.1, 0.25, 1] },
-            rotate: { duration: 3, ease: "easeInOut" }
+            rotate: { duration: 3, ease: "easeInOut" },
+            opacity: { duration: 0.1 }
           }}
         >
           <BottleSVG />
@@ -32,11 +34,13 @@ export function Bottle2D({ isSending, isReceiving }: Bottle2DProps) {
           key="receiving"
           className="absolute top-1/2"
           style={{ marginLeft: "-28px", marginTop: "-42px" }}
-          initial={{ left: "-20%" }}
+          initial={{ left: "-20%", opacity: 1 }}
           animate={{ left: "50%", rotate: [0, 5, -5, 3, -3, 0] }}
+          exit={{ left: "50%", opacity: 0 }}
           transition={{
             left: { duration: 3, ease: [0.25, 0.1, 0.25, 1] },
-            rotate: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+            rotate: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+            opacity: { duration: 0.3 }
           }}
         >
           <BottleSVG />
@@ -50,6 +54,7 @@ export function Bottle2D({ isSending, isReceiving }: Bottle2DProps) {
           style={{ marginLeft: "-28px", marginTop: "-42px" }}
           initial={{ left: "50%", opacity: 0 }}
           animate={{ left: "50%", opacity: 1, rotate: [0, 5, -5, 3, -3, 0] }}
+          exit={{ left: "50%", opacity: 0 }}
           transition={{
             left: { duration: 0.5 },
             opacity: { duration: 0.5 },
