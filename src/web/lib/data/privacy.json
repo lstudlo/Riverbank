@@ -1,0 +1,66 @@
+{
+  "title": "Privacy Policy",
+  "last_updated": "November 22, 2025",
+  "content": [
+    {
+      "heading": "1. Introduction",
+      "body": "Welcome to Riverbank. We respect your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our Service."
+    },
+    {
+      "heading": "2. Information We Collect",
+      "body": "2.1 Information You Provide\n- Messages: The text content of bottles you throw into the river\n- Optional Information: Nickname and country (if you choose to provide them)\n\n2.2 Automatically Collected Information\n- IP Address: Collected for abuse prevention and content moderation\n- Usage Data: Information about how you interact with the Service (likes, reports)\n- Browser Information: Browser type, device type, and operating system\n- Timestamps: When you post messages and interact with content\n\n2.3 Local Storage\n- Theme Preference: Your dark/light mode preference is stored locally in your browser\n- Consent Status: Your community guidelines consent is stored locally"
+    },
+    {
+      "heading": "3. How We Use Your Information",
+      "body": "We use the collected information for the following purposes:\n- Service Delivery: To provide the message-in-a-bottle exchange functionality\n- Content Moderation: To detect and prevent harmful, abusive, or illegal content using AI-powered moderation\n- Abuse Prevention: To prevent spam, harassment, and misuse of the Service\n- Analytics: To understand how users interact with the Service and improve features\n- Legal Compliance: To comply with applicable laws and respond to legal requests"
+    },
+    {
+      "heading": "4. AI Content Moderation",
+      "body": "Riverbank uses AI-powered content moderation (Llama 3.1 8B model) to automatically screen messages for harmful content. Your messages may be analyzed by this AI system to ensure compliance with our community guidelines. Messages flagged as inappropriate are not posted."
+    },
+    {
+      "heading": "5. Data Sharing and Disclosure",
+      "body": "We do not sell your personal information. We may share information in the following circumstances:\n- Public Display: Messages you post (with optional nickname/country) are visible to all users\n- Service Providers: With Cloudflare and other infrastructure providers necessary to operate the Service\n- Legal Requirements: When required by law or to protect rights, safety, and security\n- AI Moderation: Message content is processed by AI moderation services to ensure safety"
+    },
+    {
+      "heading": "6. Data Retention",
+      "body": "We retain your information as follows:\n- Messages: Stored indefinitely unless removed for violations or by user request\n- IP Addresses: Retained for moderation and abuse prevention purposes\n- Interaction Data: Likes and reports are stored with messages"
+    },
+    {
+      "heading": "7. Your Rights",
+      "body": "Depending on your location, you may have the following rights:\n- Access: Request information about data we hold about you\n- Deletion: Request deletion of your messages (subject to verification)\n- Correction: Request correction of inaccurate information\n- Objection: Object to processing of your data in certain circumstances\n\nNote: Due to the anonymous nature of the Service, it may be difficult to verify ownership of specific messages. We will make reasonable efforts to accommodate requests."
+    },
+    {
+      "heading": "8. Cookies and Tracking",
+      "body": "Riverbank uses minimal tracking:\n- Local Storage: Used only for theme preferences and consent status\n- No Third-Party Cookies: We do not use third-party advertising or tracking cookies\n- No Analytics Cookies: We do not use Google Analytics or similar services (at this time)"
+    },
+    {
+      "heading": "9. Children's Privacy",
+      "body": "The Service is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If you believe a child has provided information to us, please contact us so we can delete it."
+    },
+    {
+      "heading": "10. International Data Transfers",
+      "body": "Your information may be transferred to and processed in countries other than your own. We use Cloudflare's global infrastructure, which may store data in multiple regions. We ensure appropriate safeguards are in place for international transfers."
+    },
+    {
+      "heading": "11. Security",
+      "body": "We implement reasonable security measures to protect your information, including:\n- Secure HTTPS connections\n- Rate limiting and abuse prevention\n- AI-powered content screening\n- Regular security reviews\n\nHowever, no method of transmission over the internet is 100% secure. We cannot guarantee absolute security."
+    },
+    {
+      "heading": "12. Changes to This Policy",
+      "body": "We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated \"Last updated\" date. Continued use of the Service after changes constitutes acceptance of the updated policy."
+    },
+    {
+      "heading": "13. GDPR Compliance (European Users)",
+      "body": "If you are located in the European Economic Area (EEA), you have additional rights under the General Data Protection Regulation (GDPR), including:\n- The right to access your personal data\n- The right to rectification of inaccurate data\n- The right to erasure (\"right to be forgotten\")\n- The right to restrict processing\n- The right to data portability\n- The right to object to processing"
+    },
+    {
+      "heading": "14. California Privacy Rights (CCPA)",
+      "body": "If you are a California resident, you have rights under the California Consumer Privacy Act, including the right to know what personal information is collected and the right to delete personal information."
+    },
+    {
+      "heading": "15. Contact Us",
+      "body": "If you have questions about this Privacy Policy or wish to exercise your privacy rights, please contact us through the Service or visit riverbank.day."
+    }
+  ]
+}

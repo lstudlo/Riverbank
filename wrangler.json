@@ -48,8 +48,8 @@
 			"name": "riverbank-day",
 			"routes": [
 				{
-					"pattern": "riverbank.day/*",
-					"zone_name": "riverbank.day"
+					"pattern": "riverbank.day",
+					"custom_domain": true
 				}
 			],
 			"workers_dev": false,

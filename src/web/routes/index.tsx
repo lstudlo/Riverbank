@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,7 @@ import { River } from "@/components/river";
 import { WavyText } from "@/components/wavy-text";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { AboutSection } from "@/components/about-section";
 import { Flag, Send, Heart, ChevronUp, ChevronDown } from "lucide-react";
 import countriesData from "@/lib/data/countries.json";
 import { useConsentStore } from "@/stores/consent-store";
@@ -68,6 +69,11 @@ function App() {
 	const [reportedBottles, setReportedBottles] = useState<Set<string>>(new Set());
 	const [carouselApi, setCarouselApi] = useState<CarouselApi>();
 	const [showGuidelines, setShowGuidelines] = useState(false);
+
+	// Set document title
+	useEffect(() => {
+		document.title = "Riverbank - Cast Your Message into the Digital River";
+	}, []);
 
 	const charsRemaining = 300 - message.length;
 	const minChars = 15;
@@ -196,6 +202,9 @@ function App() {
 			{/* Main Content */}
 			<main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
 				<div className="w-full max-w-lg">
+					{/* SEO: Main heading (visually hidden but accessible to search engines and screen readers) */}
+					<h1 className="sr-only">Riverbank - Share Messages in Digital Bottles</h1>
+
 					{/* Tagline */}
 					<p className="text-foreground text-xs text-center mb-6">
 						Bottle a thought. Let it drift.
@@ -310,9 +319,10 @@ function App() {
 									}}
 								>
 									{receivedBottles.map((bottle) => (
-										<div
+										<article
 											key={bottle.id}
 											className="bg-muted rounded-lg p-4 border-[1px]"
+											aria-label={`Message in bottle number ${bottle.id_asc}`}
 										>
 											<div className="text-xs text-muted-foreground uppercase tracking-wider mb-2 flex justify-between items-center">
 												<span>Bottle #{bottle.id_asc}</span>
@@ -322,9 +332,9 @@ function App() {
 												<WavyText text={bottle.message} delay={0} />
 											</p>
 
-											<div className="text-sm text-muted-foreground italic mb-3">
+											<footer className="text-sm text-muted-foreground italic mb-3">
 												{formatSender(bottle)}
-											</div>
+											</footer>
 
 											<div className="flex justify-between items-center">
 												<button
@@ -351,7 +361,7 @@ function App() {
 													<span className="text-xs text-muted-foreground">Reported</span>
 												)}
 											</div>
-										</div>
+										</article>
 									))}
 								</motion.div>
 							) : (
@@ -378,7 +388,7 @@ function App() {
 										<CarouselContent className="-mt-1 h-[280px]">
 											{receivedBottles.map((bottle, index) => (
 												<CarouselItem key={bottle.id} className="pt-1">
-													<motion.div
+													<motion.article
 														className="bg-muted rounded-lg p-4 border-[1px]"
 														initial={{ opacity: 0, scale: 0.96 }}
 														animate={{ opacity: 1, scale: 1 }}
@@ -387,6 +397,7 @@ function App() {
 															delay: index * 0.15,
 															ease: [0.22, 1, 0.36, 1],
 														}}
+														aria-label={`Message in bottle number ${bottle.id_asc}`}
 													>
 														<div className="text-xs text-muted-foreground uppercase tracking-wider mb-2 flex justify-between items-center">
 															<span>Bottle #{bottle.id_asc}</span>
@@ -396,9 +407,9 @@ function App() {
 															<WavyText text={bottle.message} delay={index * 0.1} />
 														</p>
 
-														<div className="text-sm text-muted-foreground italic mb-3">
+														<footer className="text-sm text-muted-foreground italic mb-3">
 															{formatSender(bottle)}
-														</div>
+														</footer>
 
 														<div className="flex justify-between items-center">
 															<button
@@ -425,7 +436,7 @@ function App() {
 																<span className="text-xs text-muted-foreground">Reported</span>
 															)}
 														</div>
-													</motion.div>
+													</motion.article>
 												</CarouselItem>
 											))}
 										</CarouselContent>
@@ -471,6 +482,9 @@ function App() {
 					)}
 				</div>
 			</main>
+
+			{/* About Section for AEO */}
+			<AboutSection />
 
 			{/* River Visualization with Footer */}
 			<div className="relative shrink-0">

@@ -1,0 +1,14 @@
+# Robots.txt for Riverbank
+# https://riverbank.day
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://riverbank.day/sitemap.xml
+
+# Crawl delay (optional, set to 0 for no delay)
+# Crawl-delay: 0
+
+# Disallow specific paths (none currently)
+# Disallow: /api/

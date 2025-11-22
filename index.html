@@ -2,9 +2,126 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="icon" type="image/svg+xml" href="/vite.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Riverbank</title>
+
+		<!-- Primary Meta Tags -->
+		<title>Riverbank - Cast Your Message into the Digital River</title>
+		<meta name="title" content="Riverbank - Cast Your Message into the Digital River" />
+		<meta name="description" content="Share anonymous messages in digital bottles and discover thoughts from people around the world. Throw your message into the river and receive random bottles from the global community." />
+		<meta name="keywords" content="message in a bottle, anonymous messaging, global community, share thoughts, digital river, random messages" />
+		<meta name="author" content="Riverbank" />
+		<meta name="theme-color" content="#3b82f6" />
+
+		<!-- Canonical URL -->
+		<link rel="canonical" href="https://riverbank.day/" />
+
+		<!-- Favicon -->
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<!-- Note: PNG/ICO favicons should be created for better compatibility. See /public/IMAGE-ASSETS-README.md -->
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://riverbank.day/" />
+		<meta property="og:title" content="Riverbank - Cast Your Message into the Digital River" />
+		<meta property="og:description" content="Share anonymous messages in digital bottles and discover thoughts from people around the world. Throw your message into the river and receive random bottles from the global community." />
+		<meta property="og:image" content="https://riverbank.day/og-image.svg" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:site_name" content="Riverbank" />
+		<meta property="og:locale" content="en_US" />
+		<!-- Note: Convert og-image.svg to og-image.png for better social media compatibility. See /public/IMAGE-ASSETS-README.md -->
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content="https://riverbank.day/" />
+		<meta property="twitter:title" content="Riverbank - Cast Your Message into the Digital River" />
+		<meta property="twitter:description" content="Share anonymous messages in digital bottles and discover thoughts from people around the world. Throw your message into the river and receive random bottles from the global community." />
+		<meta property="twitter:image" content="https://riverbank.day/og-image.svg" />
+
+		<!-- Performance: Preconnect to external domains -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+
+		<!-- Structured Data (JSON-LD) for SEO/AEO -->
+		<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@graph": [
+				{
+					"@type": "WebSite",
+					"@id": "https://riverbank.day/#website",
+					"url": "https://riverbank.day/",
+					"name": "Riverbank",
+					"description": "Share anonymous messages in digital bottles and discover thoughts from people around the world",
+					"inLanguage": "en-US"
+				},
+				{
+					"@type": "WebApplication",
+					"@id": "https://riverbank.day/#webapplication",
+					"url": "https://riverbank.day/",
+					"name": "Riverbank",
+					"description": "Cast your message into the digital river and receive random bottles from the global community. Share thoughts anonymously with people worldwide.",
+					"applicationCategory": "SocialNetworkingApplication",
+					"operatingSystem": "Any",
+					"offers": {
+						"@type": "Offer",
+						"price": "0",
+						"priceCurrency": "USD"
+					},
+					"featureList": [
+						"Anonymous message sharing",
+						"Random message discovery",
+						"Global community interaction",
+						"Message moderation and reporting",
+						"Like and engage with bottles"
+					]
+				},
+				{
+					"@type": "FAQPage",
+					"@id": "https://riverbank.day/#faq",
+					"mainEntity": [
+						{
+							"@type": "Question",
+							"name": "What is Riverbank?",
+							"acceptedAnswer": {
+								"@type": "Answer",
+								"text": "Riverbank is a digital message-in-a-bottle platform where you can share anonymous messages and discover thoughts from people around the world. Write your message, throw it into the river, and receive random bottles from the global community."
+							}
+						},
+						{
+							"@type": "Question",
+							"name": "Is Riverbank free to use?",
+							"acceptedAnswer": {
+								"@type": "Answer",
+								"text": "Yes, Riverbank is completely free to use. Share and discover messages without any cost."
+							}
+						},
+						{
+							"@type": "Question",
+							"name": "Are messages on Riverbank anonymous?",
+							"acceptedAnswer": {
+								"@type": "Answer",
+								"text": "Yes, all messages are anonymous by default. You can optionally add a nickname and country, but no personal information is required or tracked."
+							}
+						},
+						{
+							"@type": "Question",
+							"name": "How does content moderation work?",
+							"acceptedAnswer": {
+								"@type": "Answer",
+								"text": "Riverbank uses AI-powered content moderation to ensure community safety. Messages are automatically screened for harmful content, and users can report inappropriate bottles."
+							}
+						}
+					]
+				}
+			]
+		}
+		</script>
+
 		<script>
 			// Prevent theme flash - runs before CSS loads
 			(function() {
