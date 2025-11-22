@@ -34,7 +34,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(getStoredTheme);
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(getInitialResolvedTheme);
 
-  // Apply theme class when theme changes
+  // Apply theme class and favicon when theme changes
   useEffect(() => {
     const resolved = theme === "system" ? getSystemTheme() : theme;
     setResolvedTheme(resolved);
@@ -42,6 +42,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const root = document.documentElement;
     root.classList.remove("light", "dark");
     root.classList.add(resolved);
+
+    // Update favicon based on theme
+    const favicon = document.querySelector('link[rel="icon"][type="image/svg+xml"]') as HTMLLinkElement;
+    if (favicon) {
+      favicon.href = resolved === "dark" ? "/logo-light.svg" : "/logo-dark.svg";
+    }
   }, [theme]);
 
   useEffect(() => {
@@ -53,6 +59,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       setResolvedTheme(resolved);
       document.documentElement.classList.remove("light", "dark");
       document.documentElement.classList.add(resolved);
+
+      // Update favicon based on system theme change
+      const favicon = document.querySelector('link[rel="icon"][type="image/svg+xml"]') as HTMLLinkElement;
+      if (favicon) {
+        favicon.href = resolved === "dark" ? "/logo-light.svg" : "/logo-dark.svg";
+      }
     };
 
     mediaQuery.addEventListener("change", handleChange);
