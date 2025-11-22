@@ -29,7 +29,7 @@ function PrivacyPolicy() {
 						</Button>
 					</Link>
 
-					<div className="bg-muted/30 rounded-2xl border border-border/50 backdrop-blur-sm flex flex-col flex-1 min-h-0">
+					<div className="bg-muted/30 rounded-none border border-border/50 backdrop-blur-sm flex flex-col flex-1 min-h-0">
 						<header className="flex-shrink-0 px-8 md:px-12 pt-8 md:pt-12 pb-6 text-center border-b border-border/30">
 							<h1 className="text-3xl md:text-4xl font-semibold text-foreground mb-2">
 								{privacyData.title}

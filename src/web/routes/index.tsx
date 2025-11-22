@@ -240,7 +240,7 @@ function App() {
 
 					{/* Composition Area */}
 					<motion.div
-						className="rounded-lg mb-6"
+						className="rounded-none mb-6"
 						animate={{
 							opacity: showThrowAnimation ? 0.4 : 1,
 							y: showThrowAnimation ? -10 : 0,
@@ -308,7 +308,7 @@ function App() {
 								onClick={throwBottle}
 								variant={"outline"}
 								disabled={loading || !canSubmit}
-								className="transition-all flex-1 rounded-xl rounded-t-none"
+								className="transition-all flex-1 rounded-none rounded-t-none"
 							>
 								{loading ? (
 									<span className="flex items-center gap-2">
@@ -334,7 +334,7 @@ function App() {
 								transition={{ duration: 0.3 }}
 								className="mb-6"
 							>
-								<Alert className='rounded-2xl items-center [&>svg]:translate-y-0' variant="destructive">
+								<Alert className='rounded-none items-center [&>svg]:translate-y-0' variant="destructive">
 									<AlertCircle className="size-4" />
 									<AlertDescription className='flex flex-row items-center justify-between w-full'>
 										{error.toLowerCase().includes("inappropriate") || error.toLowerCase().includes("content") ? (
@@ -376,7 +376,7 @@ function App() {
 									{receivedBottles.map((bottle) => (
 										<article
 											key={bottle.id}
-											className="bg-muted rounded-lg p-4 border-[1px]"
+											className="bg-muted rounded-none p-4 border-[1px]"
 											aria-label={`Message in bottle number ${bottle.id_asc}`}
 										>
 											<div className="text-xs text-muted-foreground uppercase tracking-wider mb-2 flex justify-between items-center">
@@ -444,7 +444,7 @@ function App() {
 											{receivedBottles.map((bottle, index) => (
 												<CarouselItem key={bottle.id} className="pt-1">
 													<motion.article
-														className="bg-muted rounded-lg p-4 border-[1px]"
+														className="bg-muted rounded-none p-4 border-[1px]"
 														initial={{ opacity: 0, scale: 0.96 }}
 														animate={{ opacity: 1, scale: 1 }}
 														transition={{
@@ -600,7 +600,7 @@ function App() {
 							<p>
 								If you believe your message was incorrectly flagged as inappropriate, you can report it for review.
 							</p>
-							<div className="bg-muted p-4 rounded-lg space-y-2">
+							<div className="bg-muted p-4 rounded-none space-y-2">
 								<p className="font-medium text-sm text-foreground">Your Message:</p>
 								<p className="font-serif text-foreground italic">"{message}"</p>
 								{nickname && (

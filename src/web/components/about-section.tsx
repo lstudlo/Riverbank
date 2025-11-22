@@ -27,7 +27,7 @@ export function AboutSection() {
 						transition={{ duration: 0.3 }}
 						className="overflow-hidden"
 					>
-						<div className="h-full overflow-y-auto p-6 bg-muted/30 rounded-lg border">
+						<div className="h-full overflow-y-auto p-6 bg-muted/30 rounded-none border">
 							<article className="prose prose-sm dark:prose-invert max-w-none">
 								<h2 id="about-heading" className="text-lg font-semibold mb-4">About Riverbank</h2>
 
