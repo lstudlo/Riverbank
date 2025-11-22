@@ -46,6 +46,13 @@
 		},
 		"pro": {
 			"name": "riverbank-day",
+			"routes": [
+				{
+					"pattern": "riverbank.day/*",
+					"zone_name": "riverbank.day"
+				}
+			],
+			"workers_dev": false,
 			"d1_databases": [
 				{
 					"binding": "DB",
