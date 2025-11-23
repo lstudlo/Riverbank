@@ -75,31 +75,92 @@ function BottleSVG() {
       height="84"
       viewBox="0 0 32 48"
       fill="none"
+      className="dark:invert"
       animate={{ y: [0, -6, 0] }}
       transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
     >
-      {/* Bottle body */}
-      <path
-        d="M8 18C8 16 10 14 10 14V12C10 11 11 10 12 10H20C21 10 22 11 22 12V14C22 14 24 16 24 18V42C24 44 22 46 20 46H12C10 46 8 44 8 42V18Z"
-        fill="#2d5a27"
-        fillOpacity="0.85"
-        stroke="#1a3d17"
-        strokeWidth="1"
-      />
-      {/* Bottle neck */}
-      <rect x="13" y="4" width="6" height="6" rx="1" fill="#2d5a27" stroke="#1a3d17" strokeWidth="0.5" />
-      {/* Cork */}
-      <rect x="13.5" y="1" width="5" height="4" rx="1" fill="#8b6914" />
-      {/* Glass shine */}
-      <path
-        d="M11 20C11 20 11 38 11 40C11 41 12 42 12 42"
-        stroke="white"
-        strokeOpacity="0.3"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      {/* Paper inside */}
-      <rect x="14" y="22" width="4" height="16" rx="1" fill="#f5f0e6" transform="rotate(5 16 30)" />
+      {/* Cork - pixel style */}
+      <rect x="13" y="2" width="2" height="2" fill="#000000" />
+      <rect x="15" y="2" width="2" height="2" fill="#000000" />
+      <rect x="17" y="2" width="2" height="2" fill="#000000" />
+      <rect x="13" y="4" width="2" height="2" fill="#000000" />
+      <rect x="15" y="4" width="2" height="2" fill="#000000" />
+      <rect x="17" y="4" width="2" height="2" fill="#000000" />
+
+      {/* Neck - pixel style */}
+      <rect x="12" y="6" width="2" height="2" fill="#1a1a1a" />
+      <rect x="14" y="6" width="2" height="2" fill="#000000" />
+      <rect x="16" y="6" width="2" height="2" fill="#000000" />
+      <rect x="18" y="6" width="2" height="2" fill="#1a1a1a" />
+
+      <rect x="12" y="8" width="2" height="2" fill="#1a1a1a" />
+      <rect x="14" y="8" width="2" height="2" fill="#000000" />
+      <rect x="16" y="8" width="2" height="2" fill="#000000" />
+      <rect x="18" y="8" width="2" height="2" fill="#1a1a1a" />
+
+      <rect x="12" y="10" width="2" height="2" fill="#1a1a1a" />
+      <rect x="14" y="10" width="2" height="2" fill="#000000" />
+      <rect x="16" y="10" width="2" height="2" fill="#000000" />
+      <rect x="18" y="10" width="2" height="2" fill="#1a1a1a" />
+
+      {/* Shoulder - pixel style */}
+      <rect x="10" y="12" width="2" height="2" fill="#1a1a1a" />
+      <rect x="12" y="12" width="2" height="2" fill="#1a1a1a" />
+      <rect x="14" y="12" width="2" height="2" fill="#000000" />
+      <rect x="16" y="12" width="2" height="2" fill="#000000" />
+      <rect x="18" y="12" width="2" height="2" fill="#1a1a1a" />
+      <rect x="20" y="12" width="2" height="2" fill="#1a1a1a" />
+
+      <rect x="9" y="14" width="2" height="2" fill="#1a1a1a" />
+      <rect x="11" y="14" width="2" height="2" fill="#1a1a1a" />
+      <rect x="13" y="14" width="2" height="2" fill="#000000" />
+      <rect x="15" y="14" width="2" height="2" fill="#000000" />
+      <rect x="17" y="14" width="2" height="2" fill="#1a1a1a" />
+      <rect x="19" y="14" width="2" height="2" fill="#1a1a1a" />
+      <rect x="21" y="14" width="2" height="2" fill="#1a1a1a" />
+
+      {/* Body - pixel style with paper inside */}
+      <rect x="9" y="16" width="2" height="2" fill="#1a1a1a" />
+      <rect x="11" y="16" width="2" height="2" fill="#1a1a1a" />
+      <rect x="13" y="16" width="2" height="2" fill="#000000" />
+      <rect x="15" y="16" width="2" height="2" fill="#e5e5e5" />
+      <rect x="17" y="16" width="2" height="2" fill="#1a1a1a" />
+      <rect x="19" y="16" width="2" height="2" fill="#1a1a1a" />
+      <rect x="21" y="16" width="2" height="2" fill="#1a1a1a" />
+
+      {[18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38].map(y => (
+        <g key={y}>
+          <rect x="9" y={y} width="2" height="2" fill="#1a1a1a" />
+          <rect x="11" y={y} width="2" height="2" fill="#1a1a1a" />
+          <rect x="13" y={y} width="2" height="2" fill="#000000" />
+          <rect x="15" y={y} width="2" height="2" fill="#e5e5e5" />
+          <rect x="17" y={y} width="2" height="2" fill="#1a1a1a" />
+          <rect x="19" y={y} width="2" height="2" fill="#1a1a1a" />
+          <rect x="21" y={y} width="2" height="2" fill="#1a1a1a" />
+        </g>
+      ))}
+
+      {/* Bottom - pixel style */}
+      <rect x="9" y="40" width="2" height="2" fill="#1a1a1a" />
+      <rect x="11" y="40" width="2" height="2" fill="#1a1a1a" />
+      <rect x="13" y="40" width="2" height="2" fill="#000000" />
+      <rect x="15" y="40" width="2" height="2" fill="#000000" />
+      <rect x="17" y="40" width="2" height="2" fill="#1a1a1a" />
+      <rect x="19" y="40" width="2" height="2" fill="#1a1a1a" />
+      <rect x="21" y="40" width="2" height="2" fill="#1a1a1a" />
+
+      <rect x="10" y="42" width="2" height="2" fill="#1a1a1a" />
+      <rect x="12" y="42" width="2" height="2" fill="#1a1a1a" />
+      <rect x="14" y="42" width="2" height="2" fill="#000000" />
+      <rect x="16" y="42" width="2" height="2" fill="#000000" />
+      <rect x="18" y="42" width="2" height="2" fill="#1a1a1a" />
+      <rect x="20" y="42" width="2" height="2" fill="#1a1a1a" />
+
+      <rect x="11" y="44" width="2" height="2" fill="#1a1a1a" />
+      <rect x="13" y="44" width="2" height="2" fill="#1a1a1a" />
+      <rect x="15" y="44" width="2" height="2" fill="#1a1a1a" />
+      <rect x="17" y="44" width="2" height="2" fill="#1a1a1a" />
+      <rect x="19" y="44" width="2" height="2" fill="#1a1a1a" />
     </motion.svg>
   );
 }

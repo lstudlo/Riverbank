@@ -53,6 +53,7 @@ export function ReceivedBottlesDisplay({
 							duration: 1.2,
 							ease: [0.22, 1, 0.36, 1],
 						}}
+						className="relative z-10"
 					>
 						{receivedBottles.map((bottle) => (
 							<BottleCard
@@ -63,7 +64,7 @@ export function ReceivedBottlesDisplay({
 								onLike={onLike}
 								onReport={onReport}
 								wavyTextDelay={0}
-								className="bg-muted rounded-none p-4 border-[1px]"
+								className="bg-muted rounded-none p-4 border-4 border-primary shadow-[6px_6px_0px_0px_oklch(50%_0_0)] dark:shadow-[6px_6px_0px_0px_oklch(75%_0_0)]"
 							/>
 						))}
 					</motion.div>
@@ -78,6 +79,7 @@ export function ReceivedBottlesDisplay({
 							duration: 1.2,
 							ease: [0.22, 1, 0.36, 1],
 						}}
+						className="relative z-10"
 					>
 						<Carousel
 							orientation="vertical"
@@ -107,7 +109,7 @@ export function ReceivedBottlesDisplay({
 												onLike={onLike}
 												onReport={onReport}
 												wavyTextDelay={index * 0.1}
-												className="border-2 border-primary rounded-none p-4 font-bold"
+												className="border-2 border-primary rounded-none p-4 font-bold shadow-[6px_6px_0px_0px_oklch(0%_0_0)] dark:shadow-[6px_6px_0px_0px_oklch(100%_0_0)]"
 											/>
 										</motion.div>
 									</CarouselItem>
