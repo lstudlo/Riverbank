@@ -8,34 +8,64 @@ type RiverProps = {
 };
 
 export function River({ isSending, isReceiving }: RiverProps) {
-	// Motion values for organic wave animation
+	// Motion values for jagged wave animation
 	const waveOffset1 = useMotionValue(0);
 	const waveOffset2 = useMotionValue(0);
 	const waveOffset3 = useMotionValue(0);
 
-	// Transform motion values into wave path data
-	const wavePath1 = useTransform(waveOffset1, (offset) => {
-		const amp = 12;
-		const y1 = 48 + Math.sin(offset) * amp;
-		const y2 = 48 + Math.sin(offset + 1) * amp;
-		const y3 = 48 + Math.sin(offset + 2) * amp;
-		return `M0,${y1} Q150,${y2 - 15} 300,${y1} T600,${y2} T900,${y3} T1200,${y1} L1200,144 L0,144 Z`;
-	});
+	// Helper function to create triangular/jagged wave pattern
+	const createJaggedWave = (
+		offset: number,
+		baseY: number,
+		amplitude: number,
+		wavelength: number,
+		segmentWidth: number
+	) => {
+		const points: string[] = [];
+		const width = 1200;
+		const segments = Math.ceil(width / segmentWidth);
 
-	const wavePath2 = useTransform(waveOffset2, (offset) => {
-		const amp = 8;
-		const y1 = 56 + Math.sin(offset) * amp;
-		const y2 = 56 + Math.sin(offset + 1.5) * amp;
-		const y3 = 56 + Math.sin(offset + 3) * amp;
-		return `M0,${y1} Q150,${y2 - 10} 300,${y1} T600,${y2} T900,${y3} T1200,${y1} L1200,144 L0,144 Z`;
-	});
+		// Create a continuous triangular wave function
+		const triangleWave = (x: number) => {
+			const normalized = ((x - offset * 50) / wavelength) % 1;
+			const wrapped = normalized < 0 ? normalized + 1 : normalized;
 
-	const wavePath3 = useTransform(waveOffset3, (offset) => {
-		const amp = 6;
-		const y1 = 64 + Math.sin(offset) * amp;
-		const y2 = 64 + Math.sin(offset + 2) * amp;
-		return `M0,${y1} Q200,${y2 - 5} 400,${y1} T800,${y2} T1200,${y1} L1200,144 L0,144 Z`;
-	});
+			// Triangular wave: goes 0 -> 1 -> 0
+			if (wrapped < 0.5) {
+				return wrapped * 2; // 0 to 1
+			} else {
+				return 2 - wrapped * 2; // 1 to 0
+			}
+		};
+
+		for (let i = 0; i <= segments; i++) {
+			const x = i * segmentWidth;
+			const waveValue = triangleWave(x);
+			const y = baseY + (waveValue - 0.5) * 2 * amplitude;
+
+			points.push(`${Math.min(x, width)},${y}`);
+		}
+
+		// Create path with straight lines (jagged)
+		const pathData = points.map((point, i) =>
+			i === 0 ? `M${point}` : `L${point}`
+		).join(' ');
+
+		return `${pathData} L1200,144 L0,144 Z`;
+	};
+
+	// Transform motion values into jagged wave path data
+	const wavePath1 = useTransform(waveOffset1, (offset) =>
+		createJaggedWave(offset, 48, 12, 300, 100)
+	);
+
+	const wavePath2 = useTransform(waveOffset2, (offset) =>
+		createJaggedWave(offset, 56, 8, 250, 80)
+	);
+
+	const wavePath3 = useTransform(waveOffset3, (offset) =>
+		createJaggedWave(offset, 64, 6, 350, 120)
+	);
 
 	// Animate waves continuously with different speeds
 	useEffect(() => {
