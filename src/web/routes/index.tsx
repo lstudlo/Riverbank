@@ -1,38 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import {
-	Carousel,
-	CarouselContent,
-	CarouselItem,
-	type CarouselApi,
-} from "@/components/ui/carousel";
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { River } from "@/components/river";
-import { WavyText } from "@/components/wavy-text";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { AboutSection } from "@/components/about-section";
-import { BanIcon, TrendingDownIcon, HeartIcon, ChevronUpIcon, ChevronDownIcon, CircleAlertIcon } from "raster-react";
-import countriesData from "@/lib/data/countries.json";
+import { MessageCompositionForm } from "@/components/message-composition-form";
+import { ErrorAlert } from "@/components/error-alert";
+import { ReceivedBottlesDisplay } from "@/components/received-bottles-display";
+import { CommunityGuidelinesDialog } from "@/components/community-guidelines-dialog";
+import { FalsePositiveDialog } from "@/components/false-positive-dialog";
 import { useConsentStore } from "@/stores/consent-store";
 
 export const Route = createFileRoute('/')({
@@ -68,7 +44,6 @@ function App() {
 	const [showReceiveAnimation, setShowReceiveAnimation] = useState(false);
 	const [likedBottles, setLikedBottles] = useState<Set<string>>(new Set());
 	const [reportedBottles, setReportedBottles] = useState<Set<string>>(new Set());
-	const [carouselApi, setCarouselApi] = useState<CarouselApi>();
 	const [showGuidelines, setShowGuidelines] = useState(false);
 	const [showFalsePositiveDialog, setShowFalsePositiveDialog] = useState(false);
 	const [submittingFalsePositive, setSubmittingFalsePositive] = useState(false);
@@ -78,7 +53,6 @@ function App() {
 		document.title = "Riverbank - Bottle a thought. Let it drift.";
 	}, []);
 
-	const charsRemaining = 300 - message.length;
 	const minChars = 15;
 	const canSubmit = message.trim().length >= minChars;
 
@@ -185,19 +159,6 @@ function App() {
 		}
 	};
 
-	const formatSender = (bottle: ReceivedBottle) => {
-		if (bottle.nickname && bottle.country) {
-			return `from ${bottle.nickname} in ${bottle.country}`;
-		}
-		if (bottle.nickname) {
-			return `from ${bottle.nickname}`;
-		}
-		if (bottle.country) {
-			return `from a stranger in ${bottle.country}`;
-		}
-		return "from a stranger";
-	};
-
 	const submitFalsePositiveReport = async () => {
 		setSubmittingFalsePositive(true);
 		try {
@@ -239,290 +200,39 @@ function App() {
 					</p>
 
 					{/* Composition Area */}
-					<motion.div
-						className="rounded-none mb-6"
-						animate={{
-							opacity: showThrowAnimation ? 0.4 : 1,
-							y: showThrowAnimation ? -10 : 0,
-							scale: showThrowAnimation ? 0.98 : 1,
+					<MessageCompositionForm
+						message={message}
+						setMessage={setMessage}
+						nickname={nickname}
+						setNickname={setNickname}
+						country={country}
+						setCountry={setCountry}
+						loading={loading}
+						canSubmit={canSubmit}
+						showThrowAnimation={showThrowAnimation}
+						onThrow={throwBottle}
+						onFocus={() => {
+							if (!hasAcceptedGuidelines) {
+								setShowGuidelines(true);
+							}
 						}}
-						transition={{
-							duration: 0.8,
-							ease: [0.25, 0.1, 0.25, 1],
-						}}
-					>
-						<div className="p-2 border-4 border-primary">
-							<Textarea
-								placeholder="Write your message..."
-								value={message}
-								onChange={(e) => setMessage(e.target.value.slice(0, 300))}
-								onFocus={() => {
-									if (!hasAcceptedGuidelines) {
-										setShowGuidelines(true);
-									}
-								}}
-								disabled={loading}
-								className="font-serif text-lg bg-background dark:bg-background border-0 shadow-none resize-none min-h-[120px]"
-							/>
-
-							<div className="flex justify-between items-center text-xs text-muted-foreground mt-2">
-								<span className="text-muted-foreground">
-									{message.trim().length < minChars && message.trim().length > 0 && (
-										<span className="text-amber-600">Min {minChars} chars</span>
-									)}
-									{message.trim().length >= 151 && <span className="text-green-600">3 bottles</span>}
-									{message.trim().length >= 61 && message.trim().length < 151 && <span className="text-blue-600">2 bottles</span>}
-									{message.trim().length >= minChars && message.trim().length < 61 && <span>1 bottle</span>}
-								</span>
-								<span className={charsRemaining < 30 ? "text-red-600" : ""}>
-									{message.length} / 300
-								</span>
-							</div>
-						</div>
-
-						<div className={"border-4 border-t-0 border-primary h-auto flex flex-col"}>
-
-							<div className="flex border-2 border-primary border-t-0 border-l-0 border-r-0">
-								<Input
-									type="text"
-									placeholder="Nickname (optional)"
-									value={nickname}
-									onChange={(e) => setNickname(e.target.value.slice(0, 30))}
-									disabled={loading}
-									className="flex-1 rounded-none text-sm shadow-none border-0 border-r-2 bg-background border-primary text-foreground placeholder:text-muted-foreground"
-								/>
-								<Select value={country} onValueChange={setCountry} disabled={loading}>
-									<SelectTrigger className="flex-1 rounded-none border-0 text-sm shadow-none bg-background border-border text-foreground">
-										<SelectValue placeholder="Country / Region (optional)" />
-									</SelectTrigger>
-									<SelectContent>
-										{countriesData.map(c => (
-											<SelectItem key={c.code} value={c.name}>{c.name}</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-
-							{/* Throw button */}
-							<Button
-								onClick={throwBottle}
-								variant={"default"}
-								disabled={loading || !canSubmit}
-								className="transition-all flex-1 rounded-none h-auto border-2 border-primary"
-							>
-								{loading ? (
-									<span className="flex items-center gap-2">
-										<span className="animate-pulse">Drifting...</span>
-									</span>
-								) : (
-									<span className="flex items-center gap-2">
-										<TrendingDownIcon strokeWidth={3} className="size-7 text-muted" />
-										Throw into the river
-									</span>
-								)}
-							</Button>
-						</div>
-					</motion.div>
+					/>
 
 					{/* Error Alert */}
-					<AnimatePresence>
-						{error && (
-							<motion.div
-								initial={{ opacity: 0, y: -10 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: -10 }}
-								transition={{ duration: 0.3 }}
-								className="mb-6"
-							>
-								<Alert className='rounded-none items-center [&>svg]:translate-y-0' variant="destructive">
-									<CircleAlertIcon size={16} className="size-4" />
-									<AlertDescription className='flex flex-row items-center justify-between w-full'>
-										{error.toLowerCase().includes("inappropriate") || error.toLowerCase().includes("content") ? (
-											<>
-												<span>Inappropriate content.</span>
-												<Button
-													variant="outline"
-													size="sm"
-													onClick={() => setShowFalsePositiveDialog(true)}
-													className="ml-4"
-												>
-													Report Error
-												</Button>
-											</>
-										) : (
-											<span>{error}</span>
-										)}
-									</AlertDescription>
-								</Alert>
-							</motion.div>
-						)}
-					</AnimatePresence>
+					<ErrorAlert
+						error={error}
+						onReportError={() => setShowFalsePositiveDialog(true)}
+					/>
 
 					{/* Received Bottles */}
-					<AnimatePresence>
-						{showReceivedBottle && receivedBottles.length > 0 && (
-							receivedBottles.length === 1 ? (
-								// Single bottle - show without carousel
-								<motion.div
-									key="received-bottle-single"
-									initial={{ opacity: 0, y: 40 }}
-									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, y: -30 }}
-									transition={{
-										duration: 1.2,
-										ease: [0.22, 1, 0.36, 1],
-									}}
-								>
-									{receivedBottles.map((bottle) => (
-										<article
-											key={bottle.id}
-											className="bg-muted rounded-none p-4 border-[1px]"
-											aria-label={`Message in bottle number ${bottle.id_asc}`}
-										>
-											<div className="text-xs text-muted-foreground uppercase tracking-wider mb-2 flex justify-between items-center">
-												<span>Bottle #{bottle.id_asc}</span>
-											</div>
-
-											<p className="font-serif text-lg text-foreground leading-relaxed mb-3">
-												<WavyText text={bottle.message} delay={0} />
-											</p>
-
-											<footer className="text-sm text-muted-foreground italic mb-3">
-												{formatSender(bottle)}
-											</footer>
-
-											<div className="flex justify-between items-center">
-												<button
-													onClick={() => likeBottle(bottle.id)}
-													disabled={likedBottles.has(bottle.id)}
-													className={`flex items-center gap-1 transition-colors p-1 ${likedBottles.has(bottle.id) ? 'text-pink-500' : 'text-muted-foreground hover:text-pink-500'}`}
-													title="Like this message"
-												>
-													<HeartIcon size={16} className={`size-4 ${likedBottles.has(bottle.id) ? 'fill-current' : ''}`} />
-													{bottle.like_count > 0 && (
-														<span className="text-xs">{bottle.like_count}</span>
-													)}
-												</button>
-
-												{!reportedBottles.has(bottle.id) ? (
-													<button
-														onClick={() => reportBottle(bottle.id)}
-														className="text-muted-foreground hover:text-red-600 transition-colors p-1"
-														title="Report inappropriate content"
-													>
-														<BanIcon size={16} className="size-4" />
-													</button>
-												) : (
-													<span className="text-xs text-muted-foreground">Reported</span>
-												)}
-											</div>
-										</article>
-									))}
-								</motion.div>
-							) : (
-								// Multiple bottles - use carousel
-								<motion.div
-									key="received-bottles-carousel"
-									initial={{ opacity: 0, y: 40 }}
-									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, y: -30 }}
-									transition={{
-										duration: 1.2,
-										ease: [0.22, 1, 0.36, 1],
-									}}
-								>
-									<Carousel
-										orientation="vertical"
-										opts={{
-											align: "start",
-											loop: false,
-										}}
-										setApi={setCarouselApi}
-										className="w-full"
-									>
-										<CarouselContent className="-mt-1 h-[280px]">
-											{receivedBottles.map((bottle, index) => (
-												<CarouselItem key={bottle.id} className="pt-1">
-													<motion.article
-														className="border-2 border-primary rounded-none p-4"
-														initial={{ opacity: 0, scale: 0.96 }}
-														animate={{ opacity: 1, scale: 1 }}
-														transition={{
-															duration: 0.8,
-															delay: index * 0.15,
-															ease: [0.22, 1, 0.36, 1],
-														}}
-														aria-label={`Message in bottle number ${bottle.id_asc}`}
-													>
-														<div className="text-xs text-muted-foreground uppercase tracking-wider mb-2 flex justify-between items-center">
-															<span>Bottle #{bottle.id_asc}</span>
-														</div>
-
-														<p className="font-serif font-bold text-lg text-foreground leading-relaxed mb-3">
-															<WavyText text={bottle.message} delay={index * 0.1} />
-														</p>
-
-														<footer className="text-sm text-muted-foreground/75 italic mb-3">
-															{formatSender(bottle)}
-														</footer>
-
-														<div className="flex justify-between items-center">
-															<button
-																onClick={() => likeBottle(bottle.id)}
-																disabled={likedBottles.has(bottle.id)}
-																className={`flex items-center gap-1 transition-colors p-1 ${likedBottles.has(bottle.id) ? 'text-pink-500' : 'text-muted-foreground hover:text-pink-500'}`}
-																title="Like this message"
-															>
-																<HeartIcon size={16} className={`size-4 ${likedBottles.has(bottle.id) ? 'fill-current' : ''}`} />
-																{bottle.like_count > 0 && (
-																	<span className="text-xs">{bottle.like_count}</span>
-																)}
-															</button>
-
-															{!reportedBottles.has(bottle.id) ? (
-																<button
-																	onClick={() => reportBottle(bottle.id)}
-																	className="text-muted-foreground hover:text-red-600 transition-colors p-1"
-																	title="Report inappropriate content"
-																>
-																	<BanIcon size={16} className="size-4" />
-																</button>
-															) : (
-																<span className="text-xs text-muted-foreground">Reported</span>
-															)}
-														</div>
-													</motion.article>
-												</CarouselItem>
-											))}
-										</CarouselContent>
-									</Carousel>
-									{/* Custom navigation buttons at bottom */}
-									<div className="flex justify-center items-center gap-4 mt-4">
-										<Button
-											variant="outline"
-											size="icon"
-											onClick={() => carouselApi?.scrollPrev()}
-											disabled={!carouselApi?.canScrollPrev()}
-											className=""
-										>
-											<ChevronUpIcon size={16} className="size-4" />
-											<span className="sr-only">Previous bottle</span>
-										</Button>
-										<Button
-											variant="outline"
-											size="icon"
-											onClick={() => carouselApi?.scrollNext()}
-											disabled={!carouselApi?.canScrollNext()}
-											className=""
-										>
-											<ChevronDownIcon size={16} className="size-4" />
-											<span className="sr-only">Next bottle</span>
-										</Button>
-									</div>
-								</motion.div>
-							)
-						)}
-					</AnimatePresence>
+					<ReceivedBottlesDisplay
+						receivedBottles={receivedBottles}
+						showReceivedBottle={showReceivedBottle}
+						likedBottles={likedBottles}
+						reportedBottles={reportedBottles}
+						onLike={likeBottle}
+						onReport={reportBottle}
+					/>
 
 					{/* Community Guidelines */}
 					{receivedBottles.length === 0 && !loading && message === "" && (
@@ -549,86 +259,25 @@ function App() {
 			</div>
 
 			{/* Community Guidelines Dialog */}
-			<AlertDialog open={showGuidelines} onOpenChange={setShowGuidelines}>
-				<AlertDialogContent className='border-primary border-4'>
-					<AlertDialogHeader>
-						<AlertDialogTitle className='text-center'>Community Guidelines</AlertDialogTitle>
-						<AlertDialogDescription className="space-y-3 text-left">
-							<p className={"mb-6 text-center px-4"}>
-								<a href="/" className="underline hover:text-foreground text-primary p-0.5 transition-colors">Riverbank</a> is a quiet place where unspoken thoughts drift between strangers, connected by flows of the river,
-							</p>
-							<p className="font-medium text-primary text-center">We promote:</p>
-							<ul className="list-disc list-inside space-y-1 ml-2 text-center">
-								<li>Kindness and empathy</li>
-								<li>Thoughtful reflections and genuine connections</li>
-								<li>Respectful and constructive communication</li>
-								<li>Cultural understanding and openness</li>
-							</ul>
-							<p className="font-medium text-red-400 text-center">We do not tolerate:</p>
-							<ul className="list-disc list-inside space-y-1 ml-2 text-center">
-								<li>Hate speech, harassment, or discrimination</li>
-								<li>Scams, spam, or fraudulent content</li>
-								<li>Personal attacks or threats</li>
-								<li>Explicit or inappropriate content</li>
-							</ul>
-							<p className="flex justify-center text-xs text-primary mt-8">
-								By continuing, you agree to our{"  "}
-								<a href="/terms" className="underline hover:text-foreground text-red-400 px-1.5 transition-colors">Terms of Service</a>
-								and
-								<a href="/privacy" className="underline hover:text-foreground text-red-400 px-1.5 transition-colors">Privacy Policy</a>
-							</p>
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogAction
-						className=''
-						onClick={() => {
-							acceptGuidelines();
-							setShowGuidelines(false);
-						}}
-					>
-						Accept
-					</AlertDialogAction>
-				</AlertDialogContent>
-			</AlertDialog>
+			<CommunityGuidelinesDialog
+				open={showGuidelines}
+				onOpenChange={setShowGuidelines}
+				onAccept={() => {
+					acceptGuidelines();
+					setShowGuidelines(false);
+				}}
+			/>
 
 			{/* False Positive Report Dialog */}
-			<AlertDialog open={showFalsePositiveDialog} onOpenChange={setShowFalsePositiveDialog}>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>Report False Detection</AlertDialogTitle>
-						<AlertDialogDescription className="space-y-4">
-							<p>
-								If you believe your message was incorrectly flagged as inappropriate, you can report it for review.
-							</p>
-							<div className="bg-muted p-4 rounded-none space-y-2">
-								<p className="font-medium text-sm text-foreground">Your Message:</p>
-								<p className="font-serif text-foreground italic">"{message}"</p>
-								{nickname && (
-									<p className="text-sm text-muted-foreground">Nickname: {nickname}</p>
-								)}
-								{country && (
-									<p className="text-sm text-muted-foreground">Country: {country}</p>
-								)}
-							</div>
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<div className="flex justify-end gap-3">
-						<Button
-							variant="outline"
-							onClick={() => setShowFalsePositiveDialog(false)}
-							disabled={submittingFalsePositive}
-						>
-							Cancel
-						</Button>
-						<AlertDialogAction
-							onClick={submitFalsePositiveReport}
-							disabled={submittingFalsePositive}
-						>
-							{submittingFalsePositive ? "Submitting..." : "Submit"}
-						</AlertDialogAction>
-					</div>
-				</AlertDialogContent>
-			</AlertDialog>
+			<FalsePositiveDialog
+				open={showFalsePositiveDialog}
+				onOpenChange={setShowFalsePositiveDialog}
+				message={message}
+				nickname={nickname}
+				country={country}
+				submitting={submittingFalsePositive}
+				onSubmit={submitFalsePositiveReport}
+			/>
 		</div>
 	);
 }
