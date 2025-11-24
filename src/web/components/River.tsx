@@ -155,9 +155,9 @@ export function River({ isSending, isReceiving }: RiverProps) {
 			>
 				<defs>
 					<linearGradient id="riverGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-						<stop offset="0%" stopColor="var(--color-muted-foreground)" stopOpacity="0.25" />
-						<stop offset="40%" stopColor="var(--color-muted-foreground)" stopOpacity="0.15" />
-						<stop offset="100%" stopColor="var(--color-foreground)" stopOpacity="0.25" />
+						<stop offset="0%" stopColor="#60a5fa" stopOpacity="0.4" />
+						<stop offset="40%" stopColor="#3b82f6" stopOpacity="0.3" />
+						<stop offset="100%" stopColor="#2563eb" stopOpacity="0.5" />
 					</linearGradient>
 				</defs>
 				{/* Back wave - behind the bottle */}
@@ -166,9 +166,9 @@ export function River({ isSending, isReceiving }: RiverProps) {
 				<motion.path
 					d={waveStroke1}
 					fill="none"
-					stroke="var(--color-foreground)"
+					stroke="#1e40af"
 					strokeWidth="2"
-					strokeOpacity="0.4"
+					strokeOpacity="0.5"
 				/>
 			</svg>
 
@@ -185,8 +185,8 @@ export function River({ isSending, isReceiving }: RiverProps) {
 			>
 				<defs>
 					<linearGradient id="riverGradient2" x1="0%" y1="0%" x2="0%" y2="100%">
-						<stop offset="0%" stopColor="var(--color-muted-foreground)" stopOpacity="0.5" />
-						<stop offset="100%" stopColor="var(--color-foreground)" stopOpacity="0.75" />
+						<stop offset="0%" stopColor="#60a5fa" stopOpacity="0.6" />
+						<stop offset="100%" stopColor="#2563eb" stopOpacity="0.75" />
 					</linearGradient>
 				</defs>
 				{/* Middle wave - slightly in front */}
@@ -195,9 +195,9 @@ export function River({ isSending, isReceiving }: RiverProps) {
 				<motion.path
 					d={waveStroke2}
 					fill="none"
-					stroke="var(--color-foreground)"
+					stroke="#1e40af"
 					strokeWidth="2"
-					strokeOpacity="0.5"
+					strokeOpacity="0.6"
 				/>
 				{/* Front wave - most in front */}
 				<motion.path d={wavePath3} fill="url(#riverGradient)" opacity={1} />
@@ -205,9 +205,9 @@ export function River({ isSending, isReceiving }: RiverProps) {
 				<motion.path
 					d={waveStroke3}
 					fill="none"
-					stroke="var(--color-foreground)"
+					stroke="#1e40af"
 					strokeWidth="2.5"
-					strokeOpacity="0.6"
+					strokeOpacity="0.7"
 				/>
 			</svg>
 		</div>
