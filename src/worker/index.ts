@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import { eq, ne, and, sql, max } from "drizzle-orm";
 import { getDb, bottles, falsePositiveReports, type Bottle } from "./db";
 import { nanoid } from "nanoid";
+import devRoutes from "./dev-routes";
 
 // URL/hyperlink detection to prevent scam sites
 function containsURL(text: string): boolean {
@@ -218,5 +219,11 @@ app.post("/api/false-positive", async (c) => {
 
 	return c.json({ submitted: true });
 });
+
+// ============================================
+// Development-only API (DO NOT USE IN PRODUCTION)
+// Mount dev routes under /api/dev
+// ============================================
+app.route("/api/dev", devRoutes);
 
 export default app;
