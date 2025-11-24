@@ -53,6 +53,13 @@ migrations/        # Drizzle D1 migrations
 import { Button } from "@/components/ui/button"
 ```
 
+**Icons:** Use `raster-react` for ALL icons (NOT lucide-react)
+```typescript
+import { SquareXIcon, InfoIcon } from "raster-react"
+```
+- When using shadcn components that import lucide-react, replace with raster-react equivalents
+- Always specify icon size: `<IconName size={16} />`
+
 **Vite plugins order:** TanStack Router → React → Cloudflare → TailwindCSS
 
 **Database:** Cloudflare D1 + Drizzle ORM
@@ -83,6 +90,7 @@ pnpm db:studio:local  # Drizzle Studio
 - TailwindCSS 4, shadcn/ui (new-york style)
 - TanStack Router v1
 - Drizzle ORM + Cloudflare D1
+- IMPORTANT: This project uses raster-react as the icon library
 
 ## Notes
 

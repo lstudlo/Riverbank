@@ -51,37 +51,88 @@ export function River({ isSending, isReceiving }: RiverProps) {
 			i === 0 ? `M${point}` : `L${point}`
 		).join(' ');
 
-		return `${pathData} L1200,144 L0,144 Z`;
+		return {
+			fill: `${pathData} L1200,144 L0,144 Z`,
+			stroke: pathData
+		};
+	};
+
+	// Helper to create just the top outline path for stroke
+	const createWaveOutline = (
+		offset: number,
+		baseY: number,
+		amplitude: number,
+		wavelength: number,
+		segmentWidth: number
+	) => {
+		const points: string[] = [];
+		const width = 1200;
+		const segments = Math.ceil(width / segmentWidth);
+
+		const triangleWave = (x: number) => {
+			const normalized = ((x - offset * 50) / wavelength) % 1;
+			const wrapped = normalized < 0 ? normalized + 1 : normalized;
+			if (wrapped < 0.5) {
+				return wrapped * 2;
+			} else {
+				return 2 - wrapped * 2;
+			}
+		};
+
+		for (let i = 0; i <= segments; i++) {
+			const x = i * segmentWidth;
+			const waveValue = triangleWave(x);
+			const y = baseY + (waveValue - 0.5) * 2 * amplitude;
+			points.push(`${Math.min(x, width)},${y}`);
+		}
+
+		return points.map((point, i) =>
+			i === 0 ? `M${point}` : `L${point}`
+		).join(' ');
 	};
 
 	// Transform motion values into jagged wave path data
 	const wavePath1 = useTransform(waveOffset1, (offset) =>
-		createJaggedWave(offset, 48, 12, 300, 100)
+		createJaggedWave(offset, 48, 12, 300, 100).fill
 	);
 
 	const wavePath2 = useTransform(waveOffset2, (offset) =>
-		createJaggedWave(offset, 56, 8, 250, 80)
+		createJaggedWave(offset, 56, 8, 250, 80).fill
 	);
 
 	const wavePath3 = useTransform(waveOffset3, (offset) =>
-		createJaggedWave(offset, 64, 6, 350, 120)
+		createJaggedWave(offset, 64, 6, 350, 120).fill
+	);
+
+	// Create stroke paths (just the top outline)
+	const waveStroke1 = useTransform(waveOffset1, (offset) =>
+		createWaveOutline(offset, 48, 12, 300, 100)
+	);
+
+	const waveStroke2 = useTransform(waveOffset2, (offset) =>
+		createWaveOutline(offset, 56, 8, 250, 80)
+	);
+
+	const waveStroke3 = useTransform(waveOffset3, (offset) =>
+		createWaveOutline(offset, 64, 6, 350, 120)
 	);
 
 	// Animate waves continuously with different speeds
+	// Each wave animates through exactly one wavelength cycle for seamless looping
 	useEffect(() => {
-		const anim1 = animate(waveOffset1, [0, Math.PI * 2], {
+		const anim1 = animate(waveOffset1, [0, 300 / 50], {
 			duration: 4,
 			repeat: Infinity,
 			ease: "linear",
 		});
 
-		const anim2 = animate(waveOffset2, [0, Math.PI * 2], {
+		const anim2 = animate(waveOffset2, [0, 250 / 50], {
 			duration: 6,
 			repeat: Infinity,
 			ease: "linear",
 		});
 
-		const anim3 = animate(waveOffset3, [0, Math.PI * 2], {
+		const anim3 = animate(waveOffset3, [0, 350 / 50], {
 			duration: 8,
 			repeat: Infinity,
 			ease: "linear",
@@ -111,6 +162,14 @@ export function River({ isSending, isReceiving }: RiverProps) {
 				</defs>
 				{/* Back wave - behind the bottle */}
 				<motion.path d={wavePath1} fill="url(#riverGradient)" />
+				{/* Back wave outline/border */}
+				<motion.path
+					d={waveStroke1}
+					fill="none"
+					stroke="var(--color-foreground)"
+					strokeWidth="2"
+					strokeOpacity="0.4"
+				/>
 			</svg>
 
 			{/* 2D Floating bottle - in the middle layer */}
@@ -132,8 +191,24 @@ export function River({ isSending, isReceiving }: RiverProps) {
 				</defs>
 				{/* Middle wave - slightly in front */}
 				<motion.path d={wavePath2} fill="url(#riverGradient2)" opacity={0.75} />
+				{/* Middle wave outline/border */}
+				<motion.path
+					d={waveStroke2}
+					fill="none"
+					stroke="var(--color-foreground)"
+					strokeWidth="2"
+					strokeOpacity="0.5"
+				/>
 				{/* Front wave - most in front */}
 				<motion.path d={wavePath3} fill="url(#riverGradient)" opacity={1} />
+				{/* Front wave outline/border */}
+				<motion.path
+					d={waveStroke3}
+					fill="none"
+					stroke="var(--color-foreground)"
+					strokeWidth="2.5"
+					strokeOpacity="0.6"
+				/>
 			</svg>
 		</div>
 	);

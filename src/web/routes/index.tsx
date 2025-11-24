@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { River } from "@/components/river";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { AboutSection } from "@/components/about-section";
+import { HowItWorksDialog } from "@/components/how-it-works-dialog";
 import { MessageCompositionForm } from "@/components/message-composition-form";
 import { ErrorAlert } from "@/components/error-alert";
 import { ReceivedBottlesDisplay } from "@/components/received-bottles-display";
@@ -47,6 +47,7 @@ function App() {
 	const [showGuidelines, setShowGuidelines] = useState(false);
 	const [showFalsePositiveDialog, setShowFalsePositiveDialog] = useState(false);
 	const [submittingFalsePositive, setSubmittingFalsePositive] = useState(false);
+	const [showHowItWorks, setShowHowItWorks] = useState(false);
 
 	// Set document title
 	useEffect(() => {
@@ -185,17 +186,17 @@ function App() {
 	};
 
 	return (
-		<div className="min-h-screen bg-background font-sans flex flex-col transition-colors">
-			<Header />
+		<div className="h-screen bg-background font-sans flex flex-col transition-colors overflow-hidden">
+			<Header onQuestionClick={() => setShowHowItWorks(true)} />
 
 			{/* Main Content */}
-			<main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+			<main className="flex-1 flex flex-col items-center justify-center px-4 py-2 overflow-auto">
 				<div className="w-full max-w-lg">
 					{/* SEO: Main heading (visually hidden but accessible to search engines and screen readers) */}
 					<h1 className="sr-only">Riverbank - Share Messages in Digital Bottles</h1>
 
 					{/* Tagline */}
-					<p className="text-foreground/50 text-md text-center mb-6">
+					<p className="text-foreground/50 text-md text-center mb-4">
 						Bottle a thought. Let it drift.
 					</p>
 
@@ -248,15 +249,18 @@ function App() {
 				</div>
 			</main>
 
-			{/* About Section for AEO */}
-			<AboutSection />
-
 			{/* River Visualization with Footer */}
-			<div className="relative shrink-0">
+			<div className="relative shrink-0 h-56">
 				<River isSending={showThrowAnimation} isReceiving={showReceiveAnimation} />
 
 				<Footer />
 			</div>
+
+			{/* How It Works Dialog */}
+			<HowItWorksDialog
+				open={showHowItWorks}
+				onOpenChange={setShowHowItWorks}
+			/>
 
 			{/* Community Guidelines Dialog */}
 			<CommunityGuidelinesDialog

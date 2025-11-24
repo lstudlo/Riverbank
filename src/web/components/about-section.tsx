@@ -1,21 +1,14 @@
-import { useState } from "react"
-import { ChevronDownIcon, ChevronUpIcon } from "raster-react"
 import { motion, AnimatePresence } from "motion/react"
 
-export function AboutSection() {
-	const [isOpen, setIsOpen] = useState(false)
+interface AboutSectionProps {
+	isOpen: boolean;
+	onToggle: () => void;
+}
+
+export function AboutSection({ isOpen }: AboutSectionProps) {
 
 	return (
-		<section className="w-full max-w-lg mx-auto mt-8 mb-4" aria-labelledby="about-heading">
-			<button
-				onClick={() => setIsOpen(!isOpen)}
-				className="w-full flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
-				aria-expanded={isOpen}
-				aria-controls="about-content"
-			>
-				<span>How It Works</span>
-				{isOpen ? <ChevronUpIcon className="w-4 h-4" /> : <ChevronDownIcon className="w-4 h-4" />}
-			</button>
+		<section className="w-full max-w-lg mx-auto mb-4" aria-labelledby="about-heading">
 
 			<AnimatePresence>
 				{isOpen && (

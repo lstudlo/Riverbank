@@ -18,7 +18,7 @@ function PrivacyPolicy() {
 
 	return (
 		<div className="h-screen bg-background font-sans flex flex-col transition-colors overflow-hidden">
-			<Header />
+			<Header onQuestionClick={() => {}} />
 
 			<main className="flex-1 flex flex-col items-center justify-start px-4 py-12 min-h-0">
 				<div className="w-full max-w-3xl flex flex-col flex-1 min-h-0">

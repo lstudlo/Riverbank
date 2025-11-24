@@ -20,7 +20,7 @@ export function CommunityGuidelinesDialog({
 }: CommunityGuidelinesDialogProps) {
 	return (
 		<AlertDialog open={open} onOpenChange={onOpenChange}>
-			<AlertDialogContent className='border-primary border-4'>
+			<AlertDialogContent className='border-primary border-4 max-w-2xl max-h-[80vh] overflow-y-auto'>
 				<AlertDialogHeader>
 					<AlertDialogTitle className='text-center'>Community Guidelines</AlertDialogTitle>
 					<AlertDialogDescription className="space-y-3 text-left">
