@@ -5,6 +5,13 @@ import { getDb, bottles, falsePositiveReports, type Bottle } from "./db";
 import { nanoid } from "nanoid";
 import devRoutes from "./dev-routes";
 
+// Helper to get client IP address
+function getClientIP(c: any): string {
+	return c.req.header("CF-Connecting-IP")
+		|| c.req.header("X-Forwarded-For")?.split(",")[0]?.trim()
+		|| "unknown";
+}
+
 // URL/hyperlink detection to prevent scam sites
 function containsURL(text: string): boolean {
 	const urlPatterns = [
@@ -43,15 +50,36 @@ async function moderateContent(ai: Ai, content: string): Promise<{ safe: boolean
 
 const app = new Hono<{ Bindings: Env }>();
 
-// Enable CORS for local development
-app.use("/*", cors());
+// Enable CORS with specific origins
+app.use("/*", cors({
+	origin: (origin) => {
+		// Allow localhost for development
+		if (origin.includes("localhost") || origin.includes("127.0.0.1")) {
+			return origin;
+		}
+		// Allow production domains
+		if (origin === "https://riverbank.day" || origin === "https://uat-riverbank-day.workers.dev") {
+			return origin;
+		}
+		// Deny all other origins
+		return null;
+	},
+	allowMethods: ["POST", "GET", "OPTIONS"],
+	credentials: true,
+}));
 
 // ============================================
 // Bottle Exchange API
 // ============================================
 
 // Throw a bottle and receive one in return
+// Rate limit: 5 requests per minute per IP
 app.post("/api/bottles/throw", async (c) => {
+	// Rate limiting check
+	const { success } = await c.env.THROW_RATE_LIMITER.limit({ key: getClientIP(c) });
+	if (!success) {
+		return c.json({ error: "Too many requests. Please try again later." }, 429);
+	}
 	const db = getDb(c.env.DB);
 	const { message, nickname, country } = await c.req.json<{
 		message: string;
@@ -101,11 +129,6 @@ app.post("/api/bottles/throw", async (c) => {
 		return c.json({ error: "Your content contains inappropriate content and cannot be sent" }, 400);
 	}
 
-	// Get client IP address
-	const clientIp = c.req.header("CF-Connecting-IP")
-		|| c.req.header("X-Forwarded-For")?.split(",")[0]?.trim()
-		|| null;
-
 	// Get next id_asc value
 	const maxResult = await db.select({ maxId: max(bottles.id_asc) }).from(bottles);
 	const nextIdAsc = (maxResult[0]?.maxId ?? 0) + 1;
@@ -117,7 +140,7 @@ app.post("/api/bottles/throw", async (c) => {
 		message: trimmedMessage,
 		nickname: trimmedNickname,
 		country: country?.trim() || null,
-		ip: clientIp,
+		ip: getClientIP(c),
 		status: "active",
 	}).returning();
 
@@ -148,7 +171,13 @@ app.post("/api/bottles/throw", async (c) => {
 });
 
 // Report a bottle (increment report_count)
+// Rate limit: 20 reports per minute per IP
 app.post("/api/bottles/:id/report", async (c) => {
+	// Rate limiting check
+	const { success } = await c.env.ACTION_RATE_LIMITER.limit({ key: `report:${getClientIP(c)}` });
+	if (!success) {
+		return c.json({ error: "Too many requests. Please try again later." }, 429);
+	}
 	const db = getDb(c.env.DB);
 	const id = c.req.param("id");
 
@@ -169,7 +198,13 @@ app.post("/api/bottles/:id/report", async (c) => {
 });
 
 // Like a bottle (increment like_count)
+// Rate limit: 20 likes per minute per IP
 app.post("/api/bottles/:id/like", async (c) => {
+	// Rate limiting check
+	const { success } = await c.env.ACTION_RATE_LIMITER.limit({ key: `like:${getClientIP(c)}` });
+	if (!success) {
+		return c.json({ error: "Too many requests. Please try again later." }, 429);
+	}
 	const db = getDb(c.env.DB);
 	const id = c.req.param("id");
 
@@ -190,7 +225,13 @@ app.post("/api/bottles/:id/like", async (c) => {
 });
 
 // Report false positive (message wrongly flagged as inappropriate)
+// Rate limit: 5 reports per minute per IP
 app.post("/api/false-positive", async (c) => {
+	// Rate limiting check
+	const { success } = await c.env.FALSE_POSITIVE_RATE_LIMITER.limit({ key: getClientIP(c) });
+	if (!success) {
+		return c.json({ error: "Too many requests. Please try again later." }, 429);
+	}
 	const db = getDb(c.env.DB);
 	const { message, nickname, country } = await c.req.json<{
 		message: string;
@@ -203,18 +244,13 @@ app.post("/api/false-positive", async (c) => {
 		return c.json({ error: "Message is required" }, 400);
 	}
 
-	// Get client IP address
-	const clientIp = c.req.header("CF-Connecting-IP")
-		|| c.req.header("X-Forwarded-For")?.split(",")[0]?.trim()
-		|| null;
-
 	// Insert the false positive report
 	await db.insert(falsePositiveReports).values({
 		id: nanoid(),
 		message: message.trim(),
 		nickname: nickname?.trim() || null,
 		country: country?.trim() || null,
-		ip: clientIp,
+		ip: getClientIP(c),
 	});
 
 	return c.json({ submitted: true });
@@ -222,8 +258,15 @@ app.post("/api/false-positive", async (c) => {
 
 // ============================================
 // Development-only API (DO NOT USE IN PRODUCTION)
-// Mount dev routes under /api/dev
+// Mount dev routes under /api/dev ONLY in development/uat
 // ============================================
+app.use("/api/dev/*", async (c, next) => {
+	// Block in production
+	if (c.env.ENVIRONMENT === "production") {
+		return c.json({ error: "Dev endpoints are not available in production" }, 403);
+	}
+	await next();
+});
 app.route("/api/dev", devRoutes);
 
 export default app;

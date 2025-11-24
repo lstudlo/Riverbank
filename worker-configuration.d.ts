@@ -9,8 +9,15 @@ declare namespace Cloudflare {
 		CLOUDFLARE_ACCOUNT_ID: string;
 		CLOUDFLARE_DATABASE_ID: string;
 		CLOUDFLARE_D1_API_TOKEN: string;
+		ENVIRONMENT: string;
 		DB: D1Database;
 		AI: Ai;
+		THROW_RATE_LIMITER: RateLimitBinding;
+		ACTION_RATE_LIMITER: RateLimitBinding;
+		FALSE_POSITIVE_RATE_LIMITER: RateLimitBinding;
+	}
+	interface RateLimitBinding {
+		limit(options: { key: string }): Promise<{ success: boolean }>;
 	}
 }
 interface Env extends Cloudflare.Env {}
