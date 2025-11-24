@@ -46,7 +46,7 @@ function TermsOfService() {
 										<h2 className="text-xl font-semibold text-foreground/90">
 											{section.heading}
 										</h2>
-										<div className="text-foreground/70 leading-relaxed whitespace-pre-line text-sm md:text-base">
+										<div className="font-serif text-foreground/70 leading-relaxed whitespace-pre-line text-sm md:text-base">
 											{section.body}
 										</div>
 									</section>
