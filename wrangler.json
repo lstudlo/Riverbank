@@ -2,7 +2,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"account_id": "9f4d2a24a5cb90bf0cc79c62e579081f",
 	"name": "riverbank",
-	"main": "./src/worker/index.ts",
+	"main": "./worker/index.ts",
 	"compatibility_date": "2025-10-08",
 	"compatibility_flags": [
 		"nodejs_compat"

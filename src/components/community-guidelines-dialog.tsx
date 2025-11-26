@@ -25,7 +25,7 @@ export function CommunityGuidelinesDialog({
 					<AlertDialogTitle className='text-center'>Community Guidelines</AlertDialogTitle>
 					<AlertDialogDescription className="space-y-3 text-left">
 						<p className={"mb-6 text-center px-4"}>
-							<a href="/" className="underline hover:text-foreground text-primary p-0.5 transition-colors">Riverbank</a> is a quiet place where unspoken thoughts drift between strangers, connected by flows of the river,
+							<a href="/public" className="underline hover:text-foreground text-primary p-0.5 transition-colors">Riverbank</a> is a quiet place where unspoken thoughts drift between strangers, connected by flows of the river,
 						</p>
 						<p className="font-medium text-primary text-center">We promote:</p>
 						<ul className="list-disc list-inside space-y-1 ml-2 text-center">

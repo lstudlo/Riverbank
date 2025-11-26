@@ -2,13 +2,31 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { PostHogProvider } from "posthog-js/react";
+import ReactGA from "react-ga4";
 import "./index.css";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
 
+// Initialize Google Analytics
+const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID || "G-29GPD9M6BW";
+ReactGA.initialize(GA_TRACKING_ID, {
+	gtagOptions: {
+		debug_mode: import.meta.env.MODE === "development",
+	},
+});
+
 // Create a new router instance
 const router = createRouter({ routeTree });
+
+// Track page views on route changes
+router.subscribe("onLoad", ({ toLocation }) => {
+	ReactGA.send({
+		hitType: "pageview",
+		page: toLocation.pathname + toLocation.search,
+		title: document.title,
+	});
+});
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
