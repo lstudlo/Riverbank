@@ -9,7 +9,7 @@ import "./index.css";
 import { routeTree } from "./routeTree.gen";
 
 // Initialize Google Analytics
-const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID || "G-29GPD9M6BW";
+const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID;
 ReactGA.initialize(GA_TRACKING_ID, {
 	gtagOptions: {
 		debug_mode: import.meta.env.MODE === "development",
@@ -23,7 +23,7 @@ const router = createRouter({ routeTree });
 router.subscribe("onLoad", ({ toLocation }) => {
 	ReactGA.send({
 		hitType: "pageview",
-		page: toLocation.pathname + toLocation.search,
+		page: toLocation.href,
 		title: document.title,
 	});
 });

@@ -19,11 +19,8 @@
 		<link rel="canonical" href="https://riverbank.day/" />
 
 		<!-- Favicon -->
-		<link rel="icon" type="image/svg+xml" href="/logo-dark.svg" />
-		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-		<!-- Note: PNG/ICO favicons should be created for better compatibility. See /public/IMAGE-ASSETS-README.md -->
+		<link rel="icon" type="image/png" href="/favicon.png" />
+		<link rel="shortcut icon" type="image/png" href="/favicon.png" />
 
 		<!-- Open Graph / Facebook -->
 		<meta property="og:type" content="website" />
@@ -138,12 +135,6 @@
 					theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 				}
 				document.documentElement.classList.add(theme);
-
-				// Set favicon based on theme
-				const favicon = document.querySelector('link[rel="icon"][type="image/svg+xml"]');
-				if (favicon) {
-					favicon.href = theme === 'dark' ? '/logo-light.svg' : '/logo-dark.svg';
-				}
 			})();
 		</script>
 	</head>
