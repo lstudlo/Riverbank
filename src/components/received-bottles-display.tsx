@@ -11,25 +11,25 @@ interface ReceivedBottle {
 	message: string;
 	nickname: string | null;
 	country: string | null;
-	like_count: number;
+	emoji_reactions: string;
 	report_count: number;
 }
 
 interface ReceivedBottlesDisplayProps {
 	receivedBottles: ReceivedBottle[];
 	showReceivedBottle: boolean;
-	likedBottles: Set<string>;
+	reactedBottles: Map<string, string>;
 	reportedBottles: Set<string>;
-	onLike: (bottleId: string) => void;
+	onReact: (bottleId: string, emoji: string) => void;
 	onReport: (bottleId: string) => void;
 }
 
 export function ReceivedBottlesDisplay({
 	receivedBottles,
 	showReceivedBottle,
-	likedBottles,
+	reactedBottles,
 	reportedBottles,
-	onLike,
+	onReact,
 	onReport,
 }: ReceivedBottlesDisplayProps) {
 	const [currentIndex, setCurrentIndex] = useState(0);
@@ -91,9 +91,9 @@ export function ReceivedBottlesDisplay({
 								>
 									<BottleCard
 										bottle={receivedBottles[currentIndex]}
-										likedBottles={likedBottles}
+										reactedBottles={reactedBottles}
 										reportedBottles={reportedBottles}
-										onLike={onLike}
+										onReact={onReact}
 										onReport={onReport}
 										wavyTextDelay={0}
 										className="border-0 shadow-none"

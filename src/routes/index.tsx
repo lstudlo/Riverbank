@@ -21,7 +21,7 @@ type ReceivedBottle = {
 	message: string;
 	nickname: string | null;
 	country: string | null;
-	like_count: number;
+	emoji_reactions: string;
 	report_count: number;
 };
 
@@ -42,7 +42,7 @@ function App() {
 	const [error, setError] = useState<string | null>(null);
 	const [showThrowAnimation, setShowThrowAnimation] = useState(false);
 	const [showReceiveAnimation, setShowReceiveAnimation] = useState(false);
-	const [likedBottles, setLikedBottles] = useState<Set<string>>(new Set());
+	const [reactedBottles, setReactedBottles] = useState<Map<string, string>>(new Map());
 	const [reportedBottles, setReportedBottles] = useState<Set<string>>(new Set());
 	const [showGuidelines, setShowGuidelines] = useState(false);
 	const [showFalsePositiveDialog, setShowFalsePositiveDialog] = useState(false);
@@ -62,7 +62,7 @@ function App() {
 
 		setError(null);
 		setLoading(true);
-		setLikedBottles(new Set());
+		setReactedBottles(new Map());
 		setReportedBottles(new Set());
 
 		// First, smoothly hide the received bottle if visible
@@ -141,22 +141,24 @@ function App() {
 		}
 	};
 
-	const likeBottle = async (bottleId: string) => {
+	const reactToBottle = async (bottleId: string, emoji: string) => {
 		try {
-			const response = await fetch(`/api/bottles/${bottleId}/like`, {
+			const response = await fetch(`/api/bottles/${bottleId}/react`, {
 				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ emoji }),
 			});
 
 			if (response.ok) {
 				const data = await response.json();
-				setLikedBottles(prev => new Set([...prev, bottleId]));
-				// Update the like count in the bottles array
+				setReactedBottles(prev => new Map([...prev, [bottleId, emoji]]));
+				// Update the emoji reactions in the bottles array
 				setReceivedBottles(prev => prev.map(b =>
-					b.id === bottleId ? { ...b, like_count: data.like_count } : b
+					b.id === bottleId ? { ...b, emoji_reactions: data.emoji_reactions } : b
 				));
 			}
 		} catch (err) {
-			console.error("Failed to like bottle:", err);
+			console.error("Failed to react to bottle:", err);
 		}
 	};
 
@@ -229,9 +231,9 @@ function App() {
 					<ReceivedBottlesDisplay
 						receivedBottles={receivedBottles}
 						showReceivedBottle={showReceivedBottle}
-						likedBottles={likedBottles}
+						reactedBottles={reactedBottles}
 						reportedBottles={reportedBottles}
-						onLike={likeBottle}
+						onReact={reactToBottle}
 						onReport={reportBottle}
 					/>
 

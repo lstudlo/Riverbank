@@ -163,7 +163,7 @@ app.post("/api/bottles/throw", async (c) => {
 		message: bottle.message,
 		nickname: bottle.nickname,
 		country: bottle.country,
-		like_count: bottle.like_count,
+		emoji_reactions: bottle.emoji_reactions,
 		report_count: bottle.report_count,
 	}));
 
@@ -197,31 +197,51 @@ app.post("/api/bottles/:id/report", async (c) => {
 	return c.json({ reported: true, report_count: result[0].report_count });
 });
 
-// Like a bottle (increment like_count)
-// Rate limit: 20 likes per minute per IP
-app.post("/api/bottles/:id/like", async (c) => {
+// React to a bottle with an emoji
+// Rate limit: 20 reactions per minute per IP
+app.post("/api/bottles/:id/react", async (c) => {
 	// Rate limiting check
-	const { success } = await c.env.ACTION_RATE_LIMITER.limit({ key: `like:${getClientIP(c)}` });
+	const { success } = await c.env.ACTION_RATE_LIMITER.limit({ key: `react:${getClientIP(c)}` });
 	if (!success) {
 		return c.json({ error: "Too many requests. Please try again later." }, 429);
 	}
 	const db = getDb(c.env.DB);
 	const id = c.req.param("id");
+	const { emoji } = await c.req.json<{ emoji: string }>();
 
 	if (!id) {
 		return c.json({ error: "Invalid bottle ID" }, 400);
 	}
 
-	const result = await db.update(bottles)
-		.set({ like_count: sql`like_count + 1` })
-		.where(eq(bottles.id, id))
-		.returning();
+	if (!emoji || typeof emoji !== "string") {
+		return c.json({ error: "Invalid emoji" }, 400);
+	}
 
-	if (result.length === 0) {
+	// Get the current bottle
+	const currentBottle = await db.select().from(bottles).where(eq(bottles.id, id)).limit(1);
+
+	if (currentBottle.length === 0) {
 		return c.json({ error: "Bottle not found" }, 404);
 	}
 
-	return c.json({ liked: true, like_count: result[0].like_count });
+	// Parse existing reactions
+	let reactions: Record<string, number> = {};
+	try {
+		reactions = JSON.parse(currentBottle[0].emoji_reactions);
+	} catch (e) {
+		reactions = {};
+	}
+
+	// Increment the emoji count
+	reactions[emoji] = (reactions[emoji] || 0) + 1;
+
+	// Update the bottle
+	const result = await db.update(bottles)
+		.set({ emoji_reactions: JSON.stringify(reactions) })
+		.where(eq(bottles.id, id))
+		.returning();
+
+	return c.json({ reacted: true, emoji_reactions: result[0].emoji_reactions });
 });
 
 // Report false positive (message wrongly flagged as inappropriate)
