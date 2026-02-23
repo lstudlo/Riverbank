@@ -269,7 +269,7 @@ function App() {
 					<h1 className="sr-only">Riverbank - Share Messages in Digital Bottles</h1>
 
 					{/* Tagline */}
-					<p className="text-foreground/50 text-md text-center mb-4">
+						<p className="text-muted-foreground text-md text-center mb-4">
 						Bottle a thought. Let it drift.
 					</p>
 
@@ -317,7 +317,7 @@ function App() {
 						<div className="text-center">
 							<button
 								onClick={() => setShowGuidelines(true)}
-								className="text-muted-foreground/50 text-xs hover:text-muted-foreground transition-colors underline"
+								className="text-muted-foreground text-xs hover:text-foreground transition-colors underline"
 							>
 								Community Guidelines
 							</button>
