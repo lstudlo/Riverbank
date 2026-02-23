@@ -1,5 +1,5 @@
 {
-	"name": "vite-react-template",
+	"name": "riverbank",
 	"description": "A template for building a React application with Vite, Hono, and Cloudflare Workers",
 	"private": true,
 	"type": "module",
@@ -27,7 +27,7 @@
 		"db:studio:pro": "drizzle-kit studio --config drizzle.config.pro.ts"
 	},
 	"cloudflare": {
-		"label": "Vite React Template",
+		"label": "riverbank",
 		"products": [
 			"Workers"
 		],
