@@ -9,7 +9,7 @@
 
 Riverbank is a message-in-a-bottle web application where you can throw a message into the digital ocean and receive random messages from others around the globe.
 
-![Riverbank Preview](https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/ec7f4be5-d1d6-4e94-0851-126341745400/preview)
+![Riverbank Preview](public/og-image.png)
 
 ## Features
 
