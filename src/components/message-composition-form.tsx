@@ -90,10 +90,10 @@ export function MessageCompositionForm({
 							value={nickname}
 							onChange={(e) => setNickname(e.target.value.slice(0, 30))}
 							disabled={loading}
-							className="flex-1 rounded-none outline-0 text-sm shadow-none border-0 border-r-2 bg-background border-primary text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:border-primary"
+							className="flex-[1_1_0%] min-w-0 rounded-none outline-0 text-sm shadow-none border-0 border-r-2 bg-background border-primary text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:border-primary"
 						/>
 						<Select value={country} onValueChange={setCountry} disabled={loading}>
-							<SelectTrigger className="flex-1 rounded-none border-0 text-sm shadow-none bg-background border-border text-foreground">
+							<SelectTrigger className="flex-[1_1_0%] min-w-0 rounded-none border-0 text-sm shadow-none bg-background border-border text-foreground">
 								<SelectValue placeholder="Region (optional)" />
 							</SelectTrigger>
 							<SelectContent>

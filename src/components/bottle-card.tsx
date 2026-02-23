@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { WavyText } from "@/components/wavy-text";
-import { BanIcon } from "raster-react";
+import { BanIcon, SmileIcon } from "raster-react";
 
 interface ReceivedBottle {
 	id: string;
@@ -35,7 +36,9 @@ export function BottleCard({
 	className = "",
 }: BottleCardProps) {
 	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+	const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
 	const pickerRef = useRef<HTMLDivElement>(null);
+	const buttonRef = useRef<HTMLButtonElement>(null);
 
 	const formatSender = (bottle: ReceivedBottle) => {
 		if (bottle.nickname && bottle.country) {
@@ -69,6 +72,17 @@ export function BottleCard({
 		onReact(bottle.id, emoji);
 	};
 
+	const toggleEmojiPicker = () => {
+		if (!showEmojiPicker && buttonRef.current) {
+			const rect = buttonRef.current.getBoundingClientRect();
+			setPickerPosition({
+				top: rect.top - 8, // Position above button with spacing
+				left: rect.left,
+			});
+		}
+		setShowEmojiPicker(!showEmojiPicker);
+	};
+
 	// Get reactions sorted by count
 	const sortedReactions = Object.entries(reactions)
 		.filter(([_, count]) => count > 0)
@@ -77,7 +91,12 @@ export function BottleCard({
 	// Close picker when clicking outside
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
-			if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+			if (
+				pickerRef.current &&
+				!pickerRef.current.contains(event.target as Node) &&
+				buttonRef.current &&
+				!buttonRef.current.contains(event.target as Node)
+			) {
 				setShowEmojiPicker(false);
 			}
 		};
@@ -108,8 +127,22 @@ export function BottleCard({
 				{formatSender(bottle)}
 			</footer>
 
+			<div className="flex justify-end mb-3">
+				{!reportedBottles.has(bottle.id) ? (
+					<button
+						onClick={() => onReport(bottle.id)}
+						className="text-muted-foreground hover:text-red-600 transition-colors p-1"
+						title="Report inappropriate content"
+					>
+						<BanIcon size={16} className="size-4" />
+					</button>
+				) : (
+					<span className="text-xs text-muted-foreground">Reported</span>
+				)}
+			</div>
+
 			{/* Reaction capsules - Discord style */}
-			<div className="flex flex-wrap items-center gap-1.5 mb-3">
+			<div className="flex flex-wrap items-center gap-1.5">
 				{sortedReactions.map(([emoji, count]) => (
 					<button
 						key={emoji}
@@ -135,45 +168,44 @@ export function BottleCard({
 				))}
 
 				{/* Add reaction button with picker */}
-				<div className="relative" ref={pickerRef}>
-					<button
-						onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-						className="inline-flex items-center justify-center size-7 rounded-full border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition-all"
-						title="Add reaction"
-					>
-						<span className="text-sm">+</span>
-					</button>
-					{showEmojiPicker && (
-						<div className="absolute left-0 bottom-full mb-2 z-50 bg-background border-2 border-primary rounded-md shadow-lg p-3 min-w-[240px]">
+				<button
+					ref={buttonRef}
+					onClick={toggleEmojiPicker}
+					className="inline-flex items-center justify-center gap-1 px-2 py-1 rounded-full border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition-all"
+					title="Add reaction"
+				>
+					<SmileIcon size={14} className="opacity-40" />
+					<span className="text-sm">+</span>
+				</button>
+				{showEmojiPicker &&
+					createPortal(
+						<div
+							ref={pickerRef}
+							className="fixed z-[9999] bg-muted border-4 border-primary rounded-none shadow-[8px_8px_0px_0px_oklch(50%_0_0)] dark:shadow-[8px_8px_0px_0px_oklch(75%_0_0)] p-4"
+							style={{
+								top: `${pickerPosition.top}px`,
+								left: `${pickerPosition.left}px`,
+								transform: "translateY(-100%)",
+							}}
+						>
+							<div className="text-xs text-primary uppercase tracking-wider font-bold mb-3 border-b-2 border-primary pb-2">
+								Pick a Reaction
+							</div>
 							<div className="grid grid-cols-5 gap-2">
 								{AVAILABLE_EMOJIS.map((emoji) => (
 									<button
 										key={emoji}
 										onClick={() => handleEmojiSelect(emoji)}
-										className="text-2xl hover:bg-muted p-2 rounded-md transition-all hover:scale-110"
+										className="text-2xl hover:bg-background p-2 rounded-none transition-all hover:scale-110 border-2 border-transparent hover:border-primary"
 										title={`React with ${emoji}`}
 									>
 										{emoji}
 									</button>
 								))}
 							</div>
-						</div>
+						</div>,
+						document.body
 					)}
-				</div>
-			</div>
-
-			<div className="flex justify-end">
-				{!reportedBottles.has(bottle.id) ? (
-					<button
-						onClick={() => onReport(bottle.id)}
-						className="text-muted-foreground hover:text-red-600 transition-colors p-1"
-						title="Report inappropriate content"
-					>
-						<BanIcon size={16} className="size-4" />
-					</button>
-				) : (
-					<span className="text-xs text-muted-foreground">Reported</span>
-				)}
 			</div>
 		</article>
 	);
