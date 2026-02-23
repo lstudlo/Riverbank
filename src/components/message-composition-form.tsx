@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,23 @@ import {
 } from "@/components/ui/select";
 import { CometCard } from "@/components/ui/comet-card";
 import { TrendingDownIcon } from "raster-react";
-import countriesData from "@/lib/data/countries.json";
+
+type CountryOption = {
+	code: string;
+	name: string;
+};
+
+let countriesDataPromise: Promise<CountryOption[]> | null = null;
+
+async function loadCountriesData() {
+	if (!countriesDataPromise) {
+		countriesDataPromise = import("@/lib/data/countries.json").then(
+			(mod) => mod.default as CountryOption[],
+		);
+	}
+
+	return countriesDataPromise;
+}
 
 interface MessageCompositionFormProps {
 	message: string;
@@ -42,6 +59,18 @@ export function MessageCompositionForm({
 }: MessageCompositionFormProps) {
 	const charsRemaining = 300 - message.length;
 	const minChars = 15;
+	const [countriesData, setCountriesData] = useState<CountryOption[] | null>(null);
+	const [isLoadingCountries, setIsLoadingCountries] = useState(false);
+
+	const ensureCountriesLoaded = async () => {
+		if (countriesData || isLoadingCountries) return;
+		setIsLoadingCountries(true);
+		try {
+			setCountriesData(await loadCountriesData());
+		} finally {
+			setIsLoadingCountries(false);
+		}
+	};
 
 	return (
 		<motion.div
@@ -92,14 +121,29 @@ export function MessageCompositionForm({
 							disabled={loading}
 							className="flex-[1_1_0%] min-w-0 rounded-none outline-0 text-sm shadow-none border-0 border-r-2 bg-background border-primary text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:border-primary"
 						/>
-						<Select value={country} onValueChange={setCountry} disabled={loading}>
+						<Select
+							value={country}
+							onValueChange={setCountry}
+							onOpenChange={(open) => {
+								if (open) {
+									void ensureCountriesLoaded();
+								}
+							}}
+							disabled={loading}
+						>
 							<SelectTrigger className="flex-[1_1_0%] min-w-0 rounded-none border-0 text-sm shadow-none bg-background border-border text-foreground">
 								<SelectValue placeholder="Region (optional)" />
 							</SelectTrigger>
 							<SelectContent>
-								{countriesData.map(c => (
-									<SelectItem key={c.code} value={c.name}>{c.name}</SelectItem>
-								))}
+								{countriesData
+									? countriesData.map(c => (
+										<SelectItem key={c.code} value={c.name}>{c.name}</SelectItem>
+									))
+									: (
+										<SelectItem value="__loading__" disabled>
+											{isLoadingCountries ? "Loading regions..." : "Open to load regions"}
+										</SelectItem>
+									)}
 							</SelectContent>
 						</Select>
 					</div>

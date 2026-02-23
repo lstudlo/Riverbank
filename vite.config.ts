@@ -8,7 +8,9 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 // https://vite.dev/config/
 export default defineConfig({
 	plugins: [
-		TanStackRouterVite(),
+		TanStackRouterVite({
+			autoCodeSplitting: true,
+		}),
 		react(),
 		tailwindcss(),
 		cloudflare()

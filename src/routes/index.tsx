@@ -1,15 +1,41 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { River } from "@/components/river";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { HowItWorksDialog } from "@/components/how-it-works-dialog";
 import { MessageCompositionForm } from "@/components/message-composition-form";
 import { ErrorAlert } from "@/components/error-alert";
-import { ReceivedBottlesDisplay } from "@/components/received-bottles-display";
-import { CommunityGuidelinesDialog } from "@/components/community-guidelines-dialog";
-import { FalsePositiveDialog } from "@/components/false-positive-dialog";
 import { useConsentStore } from "@/stores/consent-store";
+
+const HowItWorksDialog = lazy(async () => {
+	const mod = await import("@/components/how-it-works-dialog");
+	return { default: mod.HowItWorksDialog };
+});
+
+const CommunityGuidelinesDialog = lazy(async () => {
+	const mod = await import("@/components/community-guidelines-dialog");
+	return { default: mod.CommunityGuidelinesDialog };
+});
+
+const FalsePositiveDialog = lazy(async () => {
+	const mod = await import("@/components/false-positive-dialog");
+	return { default: mod.FalsePositiveDialog };
+});
+
+const ReceivedBottlesDisplay = lazy(async () => {
+	const mod = await import("@/components/received-bottles-display");
+	return { default: mod.ReceivedBottlesDisplay };
+});
+
+function preloadHomeDialogs() {
+	void import("@/components/how-it-works-dialog");
+	void import("@/components/community-guidelines-dialog");
+	void import("@/components/false-positive-dialog");
+}
+
+function preloadReceivedBottlesUI() {
+	void import("@/components/received-bottles-display");
+}
 
 export const Route = createFileRoute('/')({
 	component: App,
@@ -54,11 +80,32 @@ function App() {
 		document.title = "Riverbank - Bottle a thought. Let it drift.";
 	}, []);
 
+	useEffect(() => {
+		const preload = () => preloadHomeDialogs();
+		if ("requestIdleCallback" in window) {
+			const id = window.requestIdleCallback(preload, { timeout: 2000 });
+			return () => window.cancelIdleCallback(id);
+		}
+		const timeoutId = window.setTimeout(preload, 0);
+		return () => window.clearTimeout(timeoutId);
+	}, []);
+
+	useEffect(() => {
+		const preload = () => preloadReceivedBottlesUI();
+		if ("requestIdleCallback" in window) {
+			const id = window.requestIdleCallback(preload, { timeout: 3000 });
+			return () => window.cancelIdleCallback(id);
+		}
+		const timeoutId = window.setTimeout(preload, 250);
+		return () => window.clearTimeout(timeoutId);
+	}, []);
+
 	const minChars = 15;
 	const canSubmit = message.trim().length >= minChars;
 
 	const throwBottle = async () => {
 		if (!message.trim() || !canSubmit) return;
+		preloadReceivedBottlesUI();
 
 		setError(null);
 		setLoading(true);
@@ -252,14 +299,18 @@ function App() {
 					/>
 
 					{/* Received Bottles */}
-					<ReceivedBottlesDisplay
-						receivedBottles={receivedBottles}
-						showReceivedBottle={showReceivedBottle}
-						reactedBottles={reactedBottles}
-						reportedBottles={reportedBottles}
-						onReact={reactToBottle}
-						onReport={reportBottle}
-					/>
+					{receivedBottles.length > 0 ? (
+						<Suspense fallback={null}>
+							<ReceivedBottlesDisplay
+								receivedBottles={receivedBottles}
+								showReceivedBottle={showReceivedBottle}
+								reactedBottles={reactedBottles}
+								reportedBottles={reportedBottles}
+								onReact={reactToBottle}
+								onReport={reportBottle}
+							/>
+						</Suspense>
+					) : null}
 
 					{/* Community Guidelines */}
 					{receivedBottles.length === 0 && !loading && message === "" && (
@@ -283,31 +334,43 @@ function App() {
 			</div>
 
 			{/* How It Works Dialog */}
-			<HowItWorksDialog
-				open={showHowItWorks}
-				onOpenChange={setShowHowItWorks}
-			/>
+			{showHowItWorks ? (
+				<Suspense fallback={null}>
+					<HowItWorksDialog
+						open={showHowItWorks}
+						onOpenChange={setShowHowItWorks}
+					/>
+				</Suspense>
+			) : null}
 
 			{/* Community Guidelines Dialog */}
-			<CommunityGuidelinesDialog
-				open={showGuidelines}
-				onOpenChange={setShowGuidelines}
-				onAccept={() => {
-					acceptGuidelines();
-					setShowGuidelines(false);
-				}}
-			/>
+			{showGuidelines ? (
+				<Suspense fallback={null}>
+					<CommunityGuidelinesDialog
+						open={showGuidelines}
+						onOpenChange={setShowGuidelines}
+						onAccept={() => {
+							acceptGuidelines();
+							setShowGuidelines(false);
+						}}
+					/>
+				</Suspense>
+			) : null}
 
 			{/* False Positive Report Dialog */}
-			<FalsePositiveDialog
-				open={showFalsePositiveDialog}
-				onOpenChange={setShowFalsePositiveDialog}
-				message={message}
-				nickname={nickname}
-				country={country}
-				submitting={submittingFalsePositive}
-				onSubmit={submitFalsePositiveReport}
-			/>
+			{showFalsePositiveDialog ? (
+				<Suspense fallback={null}>
+					<FalsePositiveDialog
+						open={showFalsePositiveDialog}
+						onOpenChange={setShowFalsePositiveDialog}
+						message={message}
+						nickname={nickname}
+						country={country}
+						submitting={submittingFalsePositive}
+						onSubmit={submitFalsePositiveReport}
+					/>
+				</Suspense>
+			) : null}
 		</div>
 	);
 }
