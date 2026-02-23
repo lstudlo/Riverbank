@@ -1,5 +1,6 @@
 # Riverbank
 
+[![Last Commit](https://img.shields.io/github/last-commit/lstudlo/Riverbank)](https://github.com/lstudlo/Riverbank/commits/main)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
 [![Hono](https://img.shields.io/badge/Hono-4.x-E36002?logo=hono)](https://hono.dev/)
