@@ -16,7 +16,12 @@ export function Header({ onQuestionClick }: HeaderProps) {
 			<img
 				src="/banner-logo.svg"
 				alt="Riverbank"
-				className="h-6"
+				width={222}
+				height={30}
+				loading="eager"
+				decoding="async"
+				fetchPriority="high"
+				className="h-6 w-auto"
 				style={{
 					filter: resolvedTheme === "dark" ? "invert(1) brightness(1.2)" : "none",
 				}}
