@@ -42,7 +42,7 @@ function App() {
 	const [error, setError] = useState<string | null>(null);
 	const [showThrowAnimation, setShowThrowAnimation] = useState(false);
 	const [showReceiveAnimation, setShowReceiveAnimation] = useState(false);
-	const [reactedBottles, setReactedBottles] = useState<Map<string, string>>(new Map());
+	const [reactedBottles, setReactedBottles] = useState<Map<string, Set<string>>>(new Map());
 	const [reportedBottles, setReportedBottles] = useState<Set<string>>(new Set());
 	const [showGuidelines, setShowGuidelines] = useState(false);
 	const [showFalsePositiveDialog, setShowFalsePositiveDialog] = useState(false);
@@ -143,15 +143,39 @@ function App() {
 
 	const reactToBottle = async (bottleId: string, emoji: string) => {
 		try {
+			// Determine if we're adding or removing the reaction
+			const userEmojis = reactedBottles.get(bottleId) || new Set<string>();
+			const action = userEmojis.has(emoji) ? "remove" : "add";
+
 			const response = await fetch(`/api/bottles/${bottleId}/react`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ emoji }),
+				body: JSON.stringify({ emoji, action }),
 			});
 
 			if (response.ok) {
 				const data = await response.json();
-				setReactedBottles(prev => new Map([...prev, [bottleId, emoji]]));
+				// Update the local state to track which emojis the user has reacted with
+				setReactedBottles(prev => {
+					const newMap = new Map(prev);
+					const currentUserEmojis = newMap.get(bottleId) || new Set<string>();
+					const newUserEmojis = new Set(currentUserEmojis);
+
+					// Toggle the emoji based on action
+					if (action === "add") {
+						newUserEmojis.add(emoji);
+					} else {
+						newUserEmojis.delete(emoji);
+					}
+
+					if (newUserEmojis.size > 0) {
+						newMap.set(bottleId, newUserEmojis);
+					} else {
+						newMap.delete(bottleId);
+					}
+
+					return newMap;
+				});
 				// Update the emoji reactions in the bottles array
 				setReceivedBottles(prev => prev.map(b =>
 					b.id === bottleId ? { ...b, emoji_reactions: data.emoji_reactions } : b

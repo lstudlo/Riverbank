@@ -14,7 +14,7 @@ interface ReceivedBottle {
 
 interface BottleCardProps {
 	bottle: ReceivedBottle;
-	reactedBottles: Map<string, string>;
+	reactedBottles: Map<string, Set<string>>; // bottleId -> Set of emojis user reacted with
 	reportedBottles: Set<string>;
 	onReact: (bottleId: string, emoji: string) => void;
 	onReport: (bottleId: string) => void;
@@ -58,16 +58,21 @@ export function BottleCard({
 		reactions = {};
 	}
 
-	const hasReacted = reactedBottles.has(bottle.id);
-	const userReaction = reactedBottles.get(bottle.id);
+	const userReactions = reactedBottles.get(bottle.id) || new Set<string>();
 
 	const handleEmojiSelect = (emoji: string) => {
 		onReact(bottle.id, emoji);
 		setShowEmojiPicker(false);
 	};
 
-	// Get total reactions count
-	const totalReactions = Object.values(reactions).reduce((sum, count) => sum + count, 0);
+	const handleReactionClick = (emoji: string) => {
+		onReact(bottle.id, emoji);
+	};
+
+	// Get reactions sorted by count
+	const sortedReactions = Object.entries(reactions)
+		.filter(([_, count]) => count > 0)
+		.sort(([, a], [, b]) => b - a);
 
 	// Close picker when clicking outside
 	useEffect(() => {
@@ -103,47 +108,61 @@ export function BottleCard({
 				{formatSender(bottle)}
 			</footer>
 
-			<div className="flex justify-between items-center">
-				<div className="flex items-center gap-2">
-					{!hasReacted ? (
-						<div className="relative" ref={pickerRef}>
-							<button
-								onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-								className="flex items-center gap-1 transition-colors p-1 text-muted-foreground hover:text-primary"
-								title="React with emoji"
-							>
-								<span className="text-sm">😊</span>
-								{totalReactions > 0 && (
-									<span className="text-xs">{totalReactions}</span>
-								)}
-							</button>
-							{showEmojiPicker && (
-								<div className="absolute left-0 bottom-full mb-1 z-50 bg-background border-2 border-primary rounded-sm shadow-md p-2">
-									<div className="grid grid-cols-5 gap-1">
-										{AVAILABLE_EMOJIS.map((emoji) => (
-											<button
-												key={emoji}
-												onClick={() => handleEmojiSelect(emoji)}
-												className="text-lg hover:bg-muted p-1 rounded transition-colors"
-												title={`React with ${emoji}`}
-											>
-												{emoji}
-											</button>
-										))}
-									</div>
-								</div>
-							)}
-						</div>
-					) : (
-						<div className="flex items-center gap-1 p-1 text-primary">
-							<span className="text-sm">{userReaction}</span>
-							{totalReactions > 0 && (
-								<span className="text-xs">{totalReactions}</span>
-							)}
+			{/* Reaction capsules - Discord style */}
+			<div className="flex flex-wrap items-center gap-1.5 mb-3">
+				{sortedReactions.map(([emoji, count]) => (
+					<button
+						key={emoji}
+						onClick={() => handleReactionClick(emoji)}
+						className={`
+							inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-sm
+							border-2 transition-all
+							${
+								userReactions.has(emoji)
+									? "border-primary bg-primary/10 text-primary"
+									: "border-border bg-background text-muted-foreground hover:border-primary/50"
+							}
+						`}
+						title={
+							userReactions.has(emoji)
+								? `Remove ${emoji} reaction`
+								: `React with ${emoji}`
+						}
+					>
+						<span>{emoji}</span>
+						<span className="text-xs font-medium">{count}</span>
+					</button>
+				))}
+
+				{/* Add reaction button with picker */}
+				<div className="relative" ref={pickerRef}>
+					<button
+						onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+						className="inline-flex items-center justify-center size-7 rounded-full border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition-all"
+						title="Add reaction"
+					>
+						<span className="text-sm">+</span>
+					</button>
+					{showEmojiPicker && (
+						<div className="absolute left-0 bottom-full mb-2 z-50 bg-background border-2 border-primary rounded-md shadow-lg p-3 min-w-[240px]">
+							<div className="grid grid-cols-5 gap-2">
+								{AVAILABLE_EMOJIS.map((emoji) => (
+									<button
+										key={emoji}
+										onClick={() => handleEmojiSelect(emoji)}
+										className="text-2xl hover:bg-muted p-2 rounded-md transition-all hover:scale-110"
+										title={`React with ${emoji}`}
+									>
+										{emoji}
+									</button>
+								))}
+							</div>
 						</div>
 					)}
 				</div>
+			</div>
 
+			<div className="flex justify-end">
 				{!reportedBottles.has(bottle.id) ? (
 					<button
 						onClick={() => onReport(bottle.id)}

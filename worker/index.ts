@@ -197,7 +197,7 @@ app.post("/api/bottles/:id/report", async (c) => {
 	return c.json({ reported: true, report_count: result[0].report_count });
 });
 
-// React to a bottle with an emoji
+// React to a bottle with an emoji (toggle behavior)
 // Rate limit: 20 reactions per minute per IP
 app.post("/api/bottles/:id/react", async (c) => {
 	// Rate limiting check
@@ -207,7 +207,8 @@ app.post("/api/bottles/:id/react", async (c) => {
 	}
 	const db = getDb(c.env.DB);
 	const id = c.req.param("id");
-	const { emoji } = await c.req.json<{ emoji: string }>();
+	const body = await c.req.json<{ emoji: string; action?: "add" | "remove" }>();
+	const { emoji, action = "add" } = body;
 
 	if (!id) {
 		return c.json({ error: "Invalid bottle ID" }, 400);
@@ -232,8 +233,19 @@ app.post("/api/bottles/:id/react", async (c) => {
 		reactions = {};
 	}
 
-	// Increment the emoji count
-	reactions[emoji] = (reactions[emoji] || 0) + 1;
+	const currentCount = reactions[emoji] || 0;
+
+	// Toggle behavior based on action
+	if (action === "add") {
+		reactions[emoji] = currentCount + 1;
+	} else if (action === "remove") {
+		// Decrement but never go below 0
+		reactions[emoji] = Math.max(0, currentCount - 1);
+		// Clean up zero counts
+		if (reactions[emoji] === 0) {
+			delete reactions[emoji];
+		}
+	}
 
 	// Update the bottle
 	const result = await db.update(bottles)
@@ -241,7 +253,7 @@ app.post("/api/bottles/:id/react", async (c) => {
 		.where(eq(bottles.id, id))
 		.returning();
 
-	return c.json({ reacted: true, emoji_reactions: result[0].emoji_reactions });
+	return c.json({ reacted: true, emoji_reactions: result[0].emoji_reactions, action });
 });
 
 // Report false positive (message wrongly flagged as inappropriate)

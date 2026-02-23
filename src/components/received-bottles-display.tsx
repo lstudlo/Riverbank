@@ -18,7 +18,7 @@ interface ReceivedBottle {
 interface ReceivedBottlesDisplayProps {
 	receivedBottles: ReceivedBottle[];
 	showReceivedBottle: boolean;
-	reactedBottles: Map<string, string>;
+	reactedBottles: Map<string, Set<string>>; // bottleId -> Set of emojis user reacted with
 	reportedBottles: Set<string>;
 	onReact: (bottleId: string, emoji: string) => void;
 	onReport: (bottleId: string) => void;
