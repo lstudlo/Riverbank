@@ -1,90 +1,143 @@
-# React + Vite + Hono + Cloudflare Workers
+# Riverbank
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/vite-react-template)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
+[![Hono](https://img.shields.io/badge/Hono-4.x-E36002?logo=hono)](https://hono.dev/)
+[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare)](https://workers.cloudflare.com/)
 
-This template provides a minimal setup for building a React application with TypeScript and Vite, designed to run on Cloudflare Workers. It features hot module replacement, ESLint integration, and the flexibility of Workers deployments.
+**Send and receive anonymous messages across the world.**
 
-![React + TypeScript + Vite + Cloudflare Workers](https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/fc7b4b62-442b-4769-641b-ad4422d74300/public)
+Riverbank is a message-in-a-bottle web application where you can throw a message into the digital ocean and receive random messages from others around the globe.
 
-<!-- dash-content-start -->
+![Riverbank Preview](https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/ec7f4be5-d1d6-4e94-0851-126341745400/preview)
 
-🚀 Supercharge your web development with this powerful stack:
+## Features
 
-- [**React**](https://react.dev/) - A modern UI library for building interactive interfaces
-- [**Vite**](https://vite.dev/) - Lightning-fast build tooling and development server
-- [**Hono**](https://hono.dev/) - Ultralight, modern backend framework
-- [**Cloudflare Workers**](https://developers.cloudflare.com/workers/) - Edge computing platform for global deployment
+- **Throw Messages** - Write an anonymous message and cast it into the river
+- **Receive Bottles** - Get random messages from other users worldwide
+- **Reactions** - React to messages with emojis (Discord-style multi-emoji support)
+- **Content Moderation** - Report inappropriate content
+- **Rate Limiting** - Fair usage protection against spam
+- **Dark/Light Theme** - Comfortable viewing in any environment
+- **Responsive Design** - Works on desktop and mobile devices
 
-### ✨ Key Features
+## Tech Stack
 
-- 🔥 Hot Module Replacement (HMR) for rapid development
-- 📦 TypeScript support out of the box
-- 🛠️ ESLint configuration included
-- ⚡ Zero-config deployment to Cloudflare's global network
-- 🎯 API routes with Hono's elegant routing
-- 🔄 Full-stack development setup
-- 🔎 Built-in Observability to monitor your Worker
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 19, Vite 6, TanStack Router |
+| Backend | Hono.js |
+| Database | Cloudflare D1 (SQLite) |
+| ORM | Drizzle ORM |
+| Styling | TailwindCSS 4, shadcn/ui |
+| Hosting | Cloudflare Workers |
+| Icons | [raster-react](https://github.com/lstudlo/raster-react) |
 
-Get started in minutes with local development or deploy directly via the Cloudflare dashboard. Perfect for building modern, performant web applications at the edge.
+## Live Demo
 
-<!-- dash-content-end -->
+Visit the live application at: **[riverbank.day](https://riverbank.day)**
 
 ## Getting Started
 
-To start a new project with this template, run:
+### Prerequisites
 
+- Node.js 18+
+- pnpm (recommended) or npm
+- Cloudflare account (for deployment)
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm create cloudflare@latest -- --template=cloudflare/templates/vite-react-template
+git clone https://github.com/lstudlo/Riverbank.git
+cd Riverbank
 ```
 
-A live deployment of this template is available at:
-[https://react-vite-template.templates.workers.dev](https://react-vite-template.templates.workers.dev)
-
-## Development
-
-Install dependencies:
-
+2. Install dependencies:
 ```bash
-npm install
+pnpm install
 ```
 
-Start the development server with:
+3. Set up local database:
+```bash
+pnpm run db:migrate
+```
+
+### Development
+
+Start the development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Your application will be available at [http://localhost:5173](http://localhost:5173).
 
-## Production
-
-Build your project for production:
+### Database Management
 
 ```bash
-npm run build
+# Generate migrations from schema changes
+pnpm run db:generate
+
+# Apply migrations (local)
+pnpm run db:migrate
+
+# Open Drizzle Studio
+pnpm run db:studio:local
 ```
 
-Preview your build locally:
+### Production
+
+Build and deploy to Cloudflare Workers:
 
 ```bash
-npm run preview
+pnpm run build
+pnpm run deploy
 ```
 
-Deploy your project to Cloudflare Workers:
+## Project Structure
 
-```bash
-npm run build && npm run deploy
+```
+src/
+├── web/                    # React 19 frontend (Vite 6)
+│   ├── routes/             # TanStack Router (file-based)
+│   ├── components/         # React components
+│   │   └── ui/             # shadcn/ui components
+│   ├── hooks/              # Custom hooks
+│   └── lib/                # Utilities
+└── worker/                 # Hono.js API
+    └── db/                 # Drizzle schema
+
+migrations/                 # Drizzle D1 migrations
 ```
 
-Monitor your workers:
+## API Endpoints
 
-```bash
-npx wrangler tail
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/bottles/throw` | Submit a message and receive random bottles |
+| `POST` | `/api/bottles/:id/like` | Like a bottle |
+| `POST` | `/api/bottles/:id/report` | Report a bottle |
 
-## Additional Resources
+## Contributing
 
-- [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers/)
-- [Vite Documentation](https://vitejs.dev/guide/)
-- [React Documentation](https://reactjs.org/)
-- [Hono Documentation](https://hono.dev/)
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please make sure to update tests as appropriate and follow the existing code style.
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Cloudflare](https://www.cloudflare.com/) for the amazing edge computing platform
+- [shadcn/ui](https://ui.shadcn.com/) for the beautiful component library
+- [Hono](https://hono.dev/) for the lightweight web framework
+- [Drizzle ORM](https://orm.drizzle.team/) for the type-safe database toolkit
